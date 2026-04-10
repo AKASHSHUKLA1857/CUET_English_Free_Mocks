@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CUET English Mock Test Platform</title>
+<style>
+:root{--bg:#0a0e1a;--surface:#111827;--surface2:#1a2235;--border:#2a3a55;--accent:#3b82f6;--accent2:#06b6d4;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--purple:#a855f7;--orange:#f97316;--text:#e2e8f0;--text2:#94a3b8;--text3:#64748b}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.hidden{display:none!important}
+/* SCREENS */
+#homeScreen,#testScreen,#analyticsScreen,#reviewScreen{min-height:100vh}
+/* HOME */
+#homeScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;background:radial-gradient(ellipse at top,#1e3a5f 0%,var(--bg) 60%)}
+.logo{font-size:2.5rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-1px;margin-bottom:.5rem}
+.tagline{color:var(--text2);font-size:1rem;margin-bottom:3rem;text-align:center}
+.mock-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;width:100%;max-width:1000px}
+.mock-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;transition:all .2s}
+.mock-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 32px rgba(59,130,246,.15)}
+.mock-title{font-size:1.1rem;font-weight:700;margin-bottom:.5rem;color:var(--text)}
+.mock-info{font-size:.85rem;color:var(--text2);margin-bottom:1.2rem}
+.mock-btns{display:flex;flex-wrap:wrap;gap:.6rem}
+.btn{padding:.55rem 1.1rem;border-radius:8px;border:none;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#2563eb}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.btn-outline{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.btn-outline:hover{background:var(--accent);color:#fff}
+.btn-green{background:var(--green);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn-yellow{background:var(--yellow);color:#000}
+.btn-disabled{background:var(--surface2);color:var(--text3);cursor:not-allowed;border:1px solid var(--border)}
+.attempt-badge{display:inline-block;font-size:.75rem;padding:.2rem .6rem;border-radius:20px;margin-left:.5rem}
+.badge-done{background:rgba(34,197,94,.15);color:var(--green)}
+.badge-pending{background:rgba(148,163,184,.1);color:var(--text3)}
+
+/* TEST SCREEN */
+#testScreen{display:flex;flex-direction:column;height:100vh}
+.test-header{background:var(--surface);border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10}
+.test-title{font-weight:700;font-size:1rem}
+.timer{background:var(--surface2);border:1px solid var(--border);padding:.4rem 1rem;border-radius:8px;font-size:1rem;font-weight:700;font-variant-numeric:tabular-nums;min-width:100px;text-align:center}
+.timer.warning{border-color:var(--yellow);color:var(--yellow)}
+.timer.danger{border-color:var(--red);color:var(--red);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.test-body{display:flex;flex:1;overflow:hidden}
+.passage-panel{flex:0 0 45%;border-right:1px solid var(--border);overflow-y:auto;padding:1.5rem;background:var(--surface)}
+.question-panel{flex:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column}
+.passage-title{font-size:.75rem;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem}
+.passage-text{font-size:.9rem;line-height:1.8;color:var(--text2)}
+.passage-text p{margin-bottom:1rem}
+.passage-heading{font-weight:700;color:var(--text);margin-bottom:.5rem}
+.q-number{font-size:.8rem;color:var(--text2);margin-bottom:.5rem}
+.q-text{font-size:.95rem;line-height:1.6;margin-bottom:1.5rem;font-weight:500}
+.options-list{list-style:none;display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem}
+.option-item{border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;overflow:hidden}
+.option-item:hover{border-color:var(--accent);background:rgba(59,130,246,.05)}
+.option-item.selected{border-color:var(--accent);background:rgba(59,130,246,.1)}
+.option-label{display:flex;align-items:flex-start;padding:.85rem 1rem;gap:.75rem;width:100%}
+.option-key{flex-shrink:0;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;transition:all .15s}
+.option-item.selected .option-key{background:var(--accent);border-color:var(--accent);color:#fff}
+.option-text{font-size:.9rem;line-height:1.5;padding-top:2px}
+.q-actions{display:flex;flex-wrap:wrap;gap:.6rem;padding-top:.5rem;border-top:1px solid var(--border);margin-top:auto}
+.sidebar{flex:0 0 240px;border-left:1px solid var(--border);background:var(--surface);overflow-y:auto;padding:1rem}
+.sidebar-title{font-size:.75rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom.75rem:0;margin-bottom:.75rem}
+.palette-legend{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1rem}
+.legend-item{display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:var(--text2)}
+.legend-dot{width:12px;height:12px;border-radius:3px}
+.palette-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.4rem;margin-bottom:1.5rem}
+.palette-btn{aspect-ratio:1;border-radius:6px;border:1.5px solid var(--border);cursor:pointer;font-size:.75rem;font-weight:700;transition:all .1s;display:flex;align-items:center;justify-content:center}
+.palette-btn:hover{transform:scale(1.1)}
+.palette-btn.not-visited{background:var(--surface2);color:var(--text3);border-color:var(--border)}
+.palette-btn.answered{background:var(--green);color:#fff;border-color:var(--green)}
+.palette-btn.not-answered{background:var(--red);color:#fff;border-color:var(--red)}
+.palette-btn.marked{background:var(--purple);color:#fff;border-color:var(--purple)}
+.palette-btn.marked-answered{background:var(--purple);color:#fff;border-color:var(--purple);position:relative}
+.palette-btn.marked-answered::after{content:'✓';position:absolute;bottom:-2px;right:-2px;font-size:.6rem;background:var(--green);border-radius:3px;padding:0 2px}
+.palette-btn.current{outline:2.5px solid var(--accent2);outline-offset:1px}
+.section-label{font-size:.7rem;font-weight:600;color:var(--text3);margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.05em}
+.section-counts{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:1rem}
+.count-box{background:var(--surface2);border-radius:6px;padding:.4rem;text-align:center}
+.count-num{font-size:1rem;font-weight:700}
+.count-lbl{font-size:.65rem;color:var(--text3)}
+
+/* No passage panel when standalone question */
+.no-passage .passage-panel{display:none}
+.no-passage .question-panel{border-right:none}
+
+/* ANALYTICS */
+#analyticsScreen{padding:1.5rem;max-width:1200px;margin:0 auto}
+.analytics-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem}
+.analytics-title{font-size:1.4rem;font-weight:800}
+.score-hero{background:linear-gradient(135deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:20px;padding:2rem;margin-bottom:1.5rem;display:flex;flex-wrap:wrap;gap:2rem;align-items:center}
+.score-big{font-size:4rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.score-label{font-size:.85rem;color:var(--text2)}
+.score-details{display:flex;flex-wrap:wrap;gap:1rem}
+.score-stat{background:var(--surface);border-radius:10px;padding:.75rem 1.25rem;min-width:100px}
+.score-stat-val{font-size:1.5rem;font-weight:800}
+.score-stat-lbl{font-size:.75rem;color:var(--text2)}
+.stat-correct{color:var(--green)}
+.stat-wrong{color:var(--red)}
+.stat-skip{color:var(--text3)}
+.stat-acc{color:var(--accent)}
+.analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:1.5rem}
+.analytics-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.25rem}
+.analytics-card-title{font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:1rem}
+.section-row{display:flex;justify-content:space-between;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--border)}
+.section-row:last-child{border-bottom:none}
+.section-name{font-size:.85rem;font-weight:600}
+.section-stats{display:flex;gap:.75rem;align-items:center}
+.mini-stat{font-size:.8rem;color:var(--text2)}
+.acc-bar{height:4px;background:var(--surface2);border-radius:2px;margin-top:.3rem;overflow:hidden}
+.acc-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .5s}
+.insight-item{padding:.75rem;background:var(--surface2);border-radius:10px;margin-bottom:.6rem;font-size:.85rem;border-left:3px solid var(--accent)}
+.insight-item.warn{border-left-color:var(--yellow)}
+.insight-item.good{border-left-color:var(--green)}
+.insight-item.bad{border-left-color:var(--red)}
+.percentile-bar{height:24px;background:var(--surface2);border-radius:12px;overflow:hidden;position:relative;margin:1rem 0}
+.percentile-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:12px;transition:width .8s}
+.percentile-label{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:.75rem;font-weight:700;color:#fff}
+.time-bar{display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem}
+.time-bar-name{font-size:.8rem;min-width:140px;color:var(--text2)}
+.time-bar-track{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.time-bar-fill{height:100%;background:var(--accent2);border-radius:4px}
+.time-bar-val{font-size:.75rem;color:var(--text3);min-width:50px;text-align:right}
+
+/* REVIEW SCREEN */
+#reviewScreen{padding:1.5rem;max-width:1000px;margin:0 auto}
+.review-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
+.review-q{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1rem}
+.review-q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.review-passage{background:var(--surface2);border-radius:10px;padding:1rem;margin-bottom:1rem;font-size:.85rem;line-height:1.7;color:var(--text2)}
+.review-passage-title{font-size:.75rem;font-weight:700;color:var(--accent2);text-transform:uppercase;margin-bottom:.5rem}
+.review-options{list-style:none;display:flex;flex-direction:column;gap:.5rem;margin-bottom:1rem}
+.review-option{padding:.7rem 1rem;border-radius:8px;font-size:.85rem;display:flex;gap:.75rem;border:1px solid var(--border)}
+.review-option.correct{border-color:var(--green);background:rgba(34,197,94,.08);color:var(--green)}
+.review-option.wrong{border-color:var(--red);background:rgba(239,68,68,.08);color:var(--red)}
+.review-option.user-skip{border-color:var(--border)}
+.review-explanation{background:rgba(59,130,246,.07);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:1rem;font-size:.85rem;line-height:1.6;color:var(--text2);margin-bottom:.75rem}
+.review-time{font-size:.75rem;color:var(--text3);text-align:right}
+.status-correct{color:var(--green);font-size:.75rem;font-weight:700;background:rgba(34,197,94,.1);padding:.2rem .5rem;border-radius:4px}
+.status-wrong{color:var(--red);font-size:.75rem;font-weight:700;background:rgba(239,68,68,.1);padding:.2rem .5rem;border-radius:4px}
+.status-skip{color:var(--text3);font-size:.75rem;font-weight:700;background:var(--surface2);padding:.2rem .5rem;border-radius:4px}
+.filter-bar{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+.filter-btn{padding:.4rem .9rem;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:.8rem;transition:all .15s}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:480px;width:90%;box-shadow:0 32px 80px rgba(0,0,0,.5)}
+.modal-title{font-size:1.1rem;font-weight:700;margin-bottom:1rem}
+.modal-text{color:var(--text2);font-size:.9rem;margin-bottom:1.5rem;line-height:1.6}
+.modal-btns{display:flex;gap:.75rem;justify-content:flex-end}
+/* Scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+/* Responsive */
+@media(max-width:768px){
+.test-body{flex-direction:column}
+.passage-panel{flex:none;max-height:35vh;border-right:none;border-bottom:1px solid var(--border)}
+.sidebar{display:none}
+.mock-grid{grid-template-columns:1fr}
+}
+.q-section-tag{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:.2rem .6rem;border-radius:4px;display:inline-block;margin-bottom:.5rem}
+.tag-rc{background:rgba(6,182,212,.15);color:var(--accent2)}
+.tag-vocab{background:rgba(168,85,247,.15);color:var(--purple)}
+.tag-grammar{background:rgba(249,115,22,.15);color:var(--orange)}
+.tag-parajumble{background:rgba(245,158,11,.15);color:var(--yellow)}
+.tag-idioms{background:rgba(34,197,94,.15);color:var(--green)}
+.tag-literary{background:rgba(239,68,68,.15);color:var(--red)}
+</style>
+</head>
+<body>
+
+<!-- HOME SCREEN -->
+<div id="homeScreen">
+  <div class="logo">CUET English Pro</div>
+  <div class="tagline">5 Full Mock Tests · Real CBT Interface · Deep Analytics</div>
+  <div class="mock-grid" id="mockGrid"></div>
+</div>
+
+<!-- TEST SCREEN -->
+<div id="testScreen" class="hidden">
+  <div class="test-header">
+    <div>
+      <div class="test-title" id="testTitle">Mock Test 1 — Attempt 1</div>
+      <div style="font-size:.75rem;color:var(--text2)" id="testSubtitle">CUET English | 50 Questions | 60 Minutes</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem">
+      <div class="timer" id="timerDisplay">60:00</div>
+      <button class="btn btn-red" onclick="confirmSubmit()">Submit Test</button>
+    </div>
+  </div>
+  <div class="test-body" id="testBody">
+    <div class="passage-panel" id="passagePanel">
+      <div class="passage-title" id="passageLabel">Reading Comprehension</div>
+      <div id="passageContent" class="passage-text"></div>
+    </div>
+    <div class="question-panel" id="questionPanel">
+      <div class="q-section-tag" id="qSectionTag"></div>
+      <div class="q-number" id="qNumber"></div>
+      <div class="q-text" id="qText"></div>
+      <ul class="options-list" id="optionsList"></ul>
+      <div class="q-actions">
+        <button class="btn btn-primary" onclick="saveAndNext()">Save & Next</button>
+        <button class="btn btn-secondary" onclick="prevQuestion()">◀ Previous</button>
+        <button class="btn btn-yellow" onclick="markForReview()" style="color:#000" id="markBtn">Mark for Review</button>
+        <button class="btn btn-secondary" onclick="clearResponse()">Clear Response</button>
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="sidebar-title">Question Palette</div>
+      <div class="palette-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--surface2);border:1px solid var(--border)"></div>Not Visited</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Not Answered</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Answered</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Marked for Review</div>
+      </div>
+      <div class="palette-grid" id="paletteGrid"></div>
+      <div class="section-label">Summary</div>
+      <div class="section-counts">
+        <div class="count-box"><div class="count-num" id="cntAnswered">0</div><div class="count-lbl">Answered</div></div>
+        <div class="count-box"><div class="count-num" id="cntNotAnswered">0</div><div class="count-lbl">Not Ans.</div></div>
+        <div class="count-box"><div class="count-num" id="cntMarked">0</div><div class="count-lbl">Marked</div></div>
+        <div class="count-box"><div class="count-num" id="cntNotVisited">50</div><div class="count-lbl">Not Visited</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ANALYTICS SCREEN -->
+<div id="analyticsScreen" class="hidden">
+  <div class="analytics-header">
+    <div>
+      <div class="analytics-title" id="analyticsTitle">Performance Analytics</div>
+      <div style="color:var(--text2);font-size:.85rem" id="analyticsSubtitle"></div>
+    </div>
+    <div style="display:flex;gap:.75rem">
+      <button class="btn btn-secondary" onclick="goToReview()">📋 Review Answers</button>
+      <button class="btn btn-secondary" onclick="goHome()">🏠 Home</button>
+    </div>
+  </div>
+  <div class="score-hero">
+    <div>
+      <div class="score-big" id="scoreDisplay">0</div>
+      <div class="score-label">out of 250</div>
+    </div>
+    <div class="score-details" id="scoreDetails"></div>
+  </div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.25rem;margin-bottom:1.5rem">
+    <div class="analytics-card-title">Estimated CUET Percentile</div>
+    <div class="percentile-bar"><div class="percentile-fill" id="percentileFill"></div><div class="percentile-label" id="percentileLabel"></div></div>
+    <div style="font-size:.85rem;color:var(--text2)" id="percentileText"></div>
+  </div>
+  <div class="analytics-grid">
+    <div class="analytics-card">
+      <div class="analytics-card-title">Section-wise Performance</div>
+      <div id="sectionStats"></div>
+    </div>
+    <div class="analytics-card">
+      <div class="analytics-card-title">Time Analysis</div>
+      <div id="timeAnalysis"></div>
+    </div>
+    <div class="analytics-card">
+      <div class="analytics-card-title">Smart Insights</div>
+      <div id="smartInsights"></div>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW SCREEN -->
+<div id="reviewScreen" class="hidden">
+  <div class="review-header">
+    <button class="btn btn-secondary" onclick="goToAnalytics()">◀ Analytics</button>
+    <div>
+      <div style="font-weight:700;font-size:1.1rem" id="reviewTitle">Answer Review</div>
+      <div style="font-size:.8rem;color:var(--text2)" id="reviewSubtitle"></div>
+    </div>
+    <button class="btn btn-secondary" onclick="goHome()">🏠 Home</button>
+  </div>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="setFilter('all',this)">All (50)</button>
+    <button class="filter-btn" onclick="setFilter('correct',this)" id="filterCorrectBtn">✓ Correct</button>
+    <button class="filter-btn" onclick="setFilter('wrong',this)" id="filterWrongBtn">✗ Wrong</button>
+    <button class="filter-btn" onclick="setFilter('skipped',this)">— Skipped</button>
+  </div>
+  <div id="reviewContent"></div>
+</div>
+
+<!-- Submit Modal -->
+<div class="modal-overlay hidden" id="submitModal">
+  <div class="modal">
+    <div class="modal-title">Submit Test?</div>
+    <div class="modal-text" id="submitModalText"></div>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-red" onclick="submitTest()">Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== QUESTION DATA =====================
+
+const PASSAGES = {
+  // MOCK 1
+  m1p1: {
+    title: "Narrative Passage — The Couturier of Kolkata",
+    text: `<p>At 50 and on the cusp of celebrating 25 years in the fashion industry with a grand show in Mumbai, the couturier Sabyasachi Mukherjee is refreshingly unromantic about his achievements. "A lot of people think I'm a big deal, but for me, it's like running any other business. I'm not an engineer nor a doctor. I don't save lives or build bridges. I make clothes and get undue amount of attention for that."</p>
+    <p>His modesty is engaging. At heart, Mukherjee is still the boy who, back in the day as a 20-something designer, had famously said, 'Want to make it big? Be in Bengal.' While many thought the idea was bonkers, he stayed put in Kolkata unlike many of its youth who continued to move out for better opportunities. City-proud and stubbornly resistant to all advice to shift base, Mukherjee turned the narrative on its head. From his workshop in Topsia, a suburb on the eastern fringe of Kolkata dotted with tanneries, he built collections steeped in the city with a roaring Royal Bengal tiger as his logo. "Everyone told me staying in Kolkata was suicidal, but I persevered. Now, I'm bringing the whole world to Kolkata", he says, adding that his 25th anniversary show is a homage to the city that has been the core of who he is or what he creates.</p>`
+  },
+  m1p2: {
+    title: "Factual Passage — Renewable Energy",
+    text: `<p>Renewable energy is becoming an increasingly important part of the global effort to combat climate change. Unlike fossil fuels, which are finite and release harmful greenhouse gases when burned, renewable energy sources like solar, wind, and hydropower are sustainable and environmentally friendly. Countries around the world are investing in these technologies to reduce their carbon footprints and secure a cleaner future.</p>
+    <p>One of the most significant advantages of renewable energy is its ability to provide energy security. Since these resources are naturally replenished, they do not run out. Solar panels, for example, can harness the energy of the sun indefinitely, while wind turbines generate power using the natural movement of air. Similarly, hydropower systems use the flow of water to produce electricity.</p>
+    <p>However, the adoption of renewable energy is not without challenges. The initial cost of setting up a renewable energy infrastructure is high, and some technologies, like solar and wind, depend on weather conditions. Despite these hurdles, advancements in technology are making renewable energy more affordable and efficient.</p>
+    <p>India, for example, is rapidly expanding its renewable energy capacity. With initiatives like the International Solar Alliance, the country is leading global efforts to harness the power of the sun. By investing in renewables, nations do not only address environmental concerns but also create jobs and drive economic growth.</p>
+    <p>People must embrace sustainable practices, such as using energy-efficient appliances and conserving resources. Such collective efforts, paired with technological innovation, can pave the way for a brighter and cleaner future for generations to come.</p>`
+  },
+  m1p3: {
+    title: "Literary Passage — The Echoes of the Forgotten Violin",
+    text: `<p><strong>The Echoes of the Forgotten Violin</strong></p>
+    <p>In a quiet town nestled between rolling hills, an old violin shop stood at the edge of the bustling marketplace. It belonged to Mr. Mehra, a craftsman whose hands once shaped melodies from wood and string. Age had slowed him, but his heart still resonated with the music of forgotten times.</p>
+    <p>One evening, as the golden sunset bathed the town in amber light, a young boy named Karan wandered into the shop. His eyes lingered on a dusty violin resting in the corner. "Does it still sing?" he asked, his voice filled with curiosity.</p>
+    <p>Mr. Mehra smiled, lifting the violin with care. "Only if the right hands awaken it," he said, placing it in Karan's eager grasp. The boy, uncertain yet hopeful, ran his fingers across the strings. A hesitant note filled the air, trembling yet alive.</p>
+    <p>For weeks, Karan returned, learning under Mr. Mehra's watchful eye. With each lesson, the violin shed its silence, whispering forgotten tunes into the wind. The town, once indifferent, paused to listen as music danced through its streets.</p>
+    <p>One day, Karan arrived to find the shop empty, save for a single note: Keep the melody alive. Mr. Mehra had left, his purpose fulfilled.</p>
+    <p>Years later, Karan, now a musician, played that same violin in the heart of the town. Its echoes carried not just sound, but the story of a boy, an old craftsman, and a melody that refused to be forgotten.</p>`
+  },
+  // MOCK 2
+  m2p1: {
+    title: "Factual Passage — Importance of Reading",
+    text: `<p>Reading is one of the most fundamental skills a person can develop. It forms the bedrock of education and opens doors to knowledge across every field of human endeavour. In an age dominated by digital media, the importance of cultivating a reading habit has never been more relevant.</p>
+    <p>Research consistently shows that regular reading strengthens cognitive abilities. It expands vocabulary, sharpens comprehension, and enhances critical thinking. Readers are better equipped to analyse complex situations, draw informed conclusions, and communicate effectively. Moreover, reading fiction develops empathy by allowing readers to inhabit the perspective of diverse characters and experiences.</p>
+    <p>Beyond intellectual growth, reading has been linked to mental health benefits. It reduces stress, promotes relaxation, and can serve as a form of mental escape from everyday pressures. Studies have shown that even six minutes of reading can reduce stress levels by up to sixty-eight percent.</p>
+    <p>India has a rich literary heritage, with texts spanning philosophy, science, poetry, and mythology. Yet reading rates among Indian youth have declined in recent decades, partly due to the proliferation of social media and short-form content. Educators and policymakers must work together to reignite the joy of reading through libraries, book clubs, and accessible digital platforms.</p>`
+  },
+  m2p2: {
+    title: "Narrative Passage — The Last Lighthouse Keeper",
+    text: `<p>For forty years, Rajan had kept the lighthouse burning on the rocky coast of Konkan. His was a solitary life — marked by the rhythm of tides, the cry of seabirds, and the slow turning of seasons. The lighthouse was not merely his duty; it was his identity.</p>
+    <p>When the government announced that automated systems would replace all lighthouse keepers, Rajan received a letter with quiet stoicism. His colleagues were relieved, speaking of retirement and family. But Rajan felt a hollow dread. What would he be without the beam that swept the night?</p>
+    <p>On his final night, he climbed the spiral stairs one last time, polished the lens, and lit the lamp manually, as he had thousands of times before. Through the fog, a fishing vessel steered safely into the harbour, its crew unaware of the quiet vigil being kept on their behalf.</p>
+    <p>As dawn broke, Rajan descended the stairs, carrying nothing but a weathered notebook filled with decades of observations — the height of waves, the direction of storms, the names of ships he had guided home. No automated system, he reflected, would ever know the sea the way he did.</p>`
+  },
+  m2p3: {
+    title: "Literary Passage — The Weight of Silence",
+    text: `<p><strong>The Weight of Silence</strong></p>
+    <p>In the house at the end of the lane, the old woman sat each evening by the window. The street below hummed with life, children playing, vendors calling, rickshaws creaking, but she sat apart from it all, wrapped in a silence that had grown thick over the years like moss on stone.</p>
+    <p>Her granddaughter Priya visited each Sunday, bringing fruit and conversation that the old woman received with a distant smile. Priya talked of college, of friends, of the world outside. The old woman listened, her eyes gentle, her hands folded in her lap like sleeping birds.</p>
+    <p>One Sunday, Priya found her grandmother humming softly — an old melody, half-remembered, threaded through with names and places long gone. "What song is that?" Priya asked. The old woman paused, and for a moment her eyes cleared. "A song your grandfather taught me," she said. "On the day we left everything behind."</p>
+    <p>Priya held her hand then, and they sat together as the evening deepened, two women bridged by a song that carried the weight of all that had been lost and, quietly, all that endured.</p>`
+  },
+  // MOCK 3
+  m3p1: {
+    title: "Factual Passage — Urbanisation and Its Challenges",
+    text: `<p>Urbanisation, the process by which increasing proportions of a population come to live in cities and towns, is one of the most significant demographic trends of the twenty-first century. By 2050, it is estimated that nearly seventy percent of the world's population will reside in urban areas. While urbanisation brings economic opportunity and improved access to services, it also poses serious challenges.</p>
+    <p>Rapid urban growth often outpaces infrastructure development. Cities in developing nations struggle to provide adequate housing, clean water, sanitation, and public transport to swelling populations. The result is the proliferation of informal settlements, commonly called slums, where residents live without basic amenities and legal land tenure.</p>
+    <p>Environmental pressures are equally severe. Urban areas are responsible for a disproportionate share of global greenhouse gas emissions and generate enormous quantities of waste. Heat islands — zones where concrete and asphalt trap solar energy — raise temperatures in cities significantly above surrounding rural areas, increasing energy consumption and health risks.</p>
+    <p>Nevertheless, well-managed urbanisation can be a powerful driver of human development. Smart city initiatives, green infrastructure, and participatory urban planning offer pathways to equitable and sustainable cities. The challenge is not urbanisation itself, but ensuring that its benefits are shared widely and its costs managed responsibly.</p>`
+  },
+  m3p2: {
+    title: "Narrative Passage — The Language of Kites",
+    text: `<p>Every January, the rooftops of Ahmedabad became a battlefield of colour and string. Arjun had spent every Uttarayan of his childhood learning to read the sky from his grandfather — when to pull, when to release, when to cut, and when to let the kite soar freely without interference.</p>
+    <p>"A kite is like a conversation," his grandfather had told him. "You must listen as much as you speak." Arjun had not understood then. He was nine, impatient, greedy for the thrill of cutting a rival's string. He had broken countless kites through sheer stubbornness, tugging when he should have yielded.</p>
+    <p>Now, at thirty-five, standing on the same rooftop with his own daughter, he held the string with a steadiness he had taken years to earn. He watched her tug and release, her small face fierce with concentration, and he felt the memory of his grandfather's hand guiding his own rise through him like warmth.</p>
+    <p>"Let it breathe," he said softly. And the kite climbed higher, bright against the winter blue, carrying the inheritance of patience from hand to hand across time.</p>`
+  },
+  m3p3: {
+    title: "Literary Passage — The Cartographer's Dream",
+    text: `<p><strong>The Cartographer's Dream</strong></p>
+    <p>All his life, Vikram had mapped territories that other men walked through without looking. Forests that breathed differently at dawn, rivers that carried the memory of floods in their bends, villages where the soil held the colour of old settlements. He drew not just land but time.</p>
+    <p>Colleagues called him meticulous. His wife called him absent. He would sit for hours in the field, pressing his ear to the earth as if listening for something that cartography had no symbol for. What he sought was the invisible architecture beneath the visible — the stories that shaped the landscape before any road was laid or boundary drawn.</p>
+    <p>When he finally retired, he was given a ceremonial map of the country he had spent forty years charting. It was accurate, detailed, and entirely silent. He hung it on his wall and sat before it each morning, tracing the lines with his fingertip, hearing in each contour the ten thousand things the map could not say.</p>
+    <p>Mapping, he understood at last, was not the act of defining a place. It was an act of reverence — an acknowledgement that beneath every mark lay a mystery deeper than any survey could reach.</p>`
+  },
+  // MOCK 4
+  m4p1: {
+    title: "Factual Passage — Artificial Intelligence in Education",
+    text: `<p>Artificial intelligence is transforming education in profound ways, offering personalised learning experiences that were previously impossible at scale. Adaptive learning platforms analyse student performance in real time, identifying strengths and gaps to tailor content accordingly. This individualised approach holds particular promise for students with different learning styles and paces.</p>
+    <p>AI-powered tools are also reshaping the role of teachers. Administrative tasks such as grading, attendance tracking, and curriculum planning can now be automated, freeing educators to focus on mentoring, creative instruction, and emotional support — areas where human judgment remains irreplaceable. In resource-constrained settings, AI can extend educational access to students in remote areas through virtual tutors and interactive content.</p>
+    <p>However, the integration of AI in education raises significant concerns. Issues of data privacy, algorithmic bias, and the digital divide threaten to deepen inequalities rather than reduce them. Students without reliable internet access or devices are excluded from AI-enhanced learning environments, potentially widening the gap between privileged and underprivileged learners.</p>
+    <p>Thoughtful regulation, equitable infrastructure investment, and teacher training are essential if AI is to fulfil its educational promise. Technology must serve pedagogy, not supplant it. The ultimate measure of AI in education must be whether it helps more children learn more effectively, equitably, and joyfully.</p>`
+  },
+  m4p2: {
+    title: "Narrative Passage — The Garden in the Desert",
+    text: `<p>No one had believed Meera when she announced she would grow a garden in the dry, stony stretch of land behind her ancestral home in Rajasthan. The land had not yielded crops in two generations. Neighbours shook their heads with the particular certainty of those who have seen many dreams die in that soil.</p>
+    <p>Meera had studied traditional water harvesting techniques — johads, khadins, and talabs — structures her great-grandparents had used before abandonment and drought stripped the memory from the land. She dug by hand during the cool mornings, shaped earthen berms to capture the scarce monsoon rains, and planted seeds adapted to arid conditions.</p>
+    <p>Three years passed before the land offered the first green shoot of faith. By the fifth year, the garden held pomegranates, amaranth, and drought-resistant grasses. The birds returned first, then the insects, then the neighbours who had shaken their heads — arriving quietly at first, then with questions.</p>
+    <p>Meera answered each question patiently. She had not merely grown a garden. She had grown back the knowledge that belonged to the land, and returned it to people who had forgotten they once knew it.</p>`
+  },
+  m4p3: {
+    title: "Literary Passage — Letters Never Sent",
+    text: `<p><strong>Letters Never Sent</strong></p>
+    <p>In the years after the partition, Amrita wrote to her cousin Zara every week. She wrote of the monsoon arriving late, of her daughter learning to walk, of the jasmine climbing the boundary wall of the new house. She wrote as though the border were merely an inconvenience, a temporary administrative arrangement that any postman could negotiate.</p>
+    <p>The letters were never sent. Each one was folded and placed inside a brass box that sat on the highest shelf. Amrita told herself she was waiting for the right moment — for the routes to reopen, for the politics to settle, for the world to recover its sense.</p>
+    <p>Decades later, her granddaughter found the box. She read each letter carefully, noting the dates, the details, the small careful descriptions of an ordinary life being lived under the shadow of an extraordinary loss. The letters were not addressed to Zara alone. They were addressed to all the futures that had been interrupted.</p>
+    <p>She had them translated and published. The title she chose was simple: <em>What the Jasmine Remembered.</em> It became, without anyone quite intending it, a record of how people carry what they cannot put down.</p>`
+  },
+  // MOCK 5
+  m5p1: {
+    title: "Factual Passage — Mental Health Awareness",
+    text: `<p>Mental health is an integral component of overall well-being, yet it remains among the most neglected areas of public health worldwide. The World Health Organization defines mental health not merely as the absence of mental disorders, but as a state of well-being in which individuals realise their abilities, cope with normal life stresses, work productively, and contribute to their communities.</p>
+    <p>Despite its significance, mental health care faces systemic barriers. Stigma remains one of the most pervasive challenges, preventing individuals from seeking help and perpetuating cycles of silence and suffering. In many cultures, mental illness is misunderstood as a personal failing, a spiritual affliction, or a consequence of moral weakness — misconceptions that delay diagnosis and treatment.</p>
+    <p>India bears one of the world's largest mental health burdens, with an estimated 150 million people in need of mental health services. Yet the country has fewer than 0.3 psychiatrists per 100,000 people, far below the global average. The treatment gap — the proportion of those needing care who do not receive it — exceeds eighty percent in many states.</p>
+    <p>Investing in mental health is not merely a humanitarian imperative; it is an economic one. Untreated mental illness costs nations trillions in lost productivity annually. Community-based care models, training of primary health workers, and integration of mental health into general health systems offer scalable, cost-effective pathways to addressing this crisis.</p>`
+  },
+  m5p2: {
+    title: "Narrative Passage — The Interpreter",
+    text: `<p>Fatima had translated for thirty-seven languages across four decades, but she had never translated grief before. Not truly. She had translated the words of grief — condolences, announcements, eulogies — but she had always kept herself on the technical side of language, a clear glass between the feeling and the expression.</p>
+    <p>That changed the afternoon a young Rohingya woman sat across from her in the resettlement office, holding a photograph of people Fatima could not name, in a place she had never been. The woman spoke in Burmese, which Fatima understood, but the woman also spoke in pauses, in the way she pressed the photograph flat against the table, in the slight motion of her shoulders when the interpreter from the government began a sentence with the word "unfortunately."</p>
+    <p>Fatima found herself translating not just the words but the silences between them — not distorting, but completing, the way a musician fills a rest in a score not with sound but with attention.</p>
+    <p>Afterwards, the woman touched Fatima's hand briefly and said something in a dialect Fatima only partially understood. But she understood enough. She understood that language, at its deepest, was not about words at all.</p>`
+  },
+  m5p3: {
+    title: "Literary Passage — The Museum of Ordinary Things",
+    text: `<p><strong>The Museum of Ordinary Things</strong></p>
+    <p>The curator of the Museum of Ordinary Things was a small, precise woman named Dr. Leela Nair who had devoted her career to objects that history had overlooked. The museum's collection included a dented tin lunchbox from a 1960s textile mill, a handwritten bus schedule from a town that no longer existed, a child's sandal found in the debris of a demolished neighbourhood.</p>
+    <p>Visitors often arrived expecting the magnificent and left puzzling over the mundane. "Why a sandal?" a journalist once asked. Dr. Nair considered the question carefully. "Because someone wore it," she said. "Because a child walked somewhere in it. Because one day it was left behind, and that act of leaving behind is the beginning of every history ever written."</p>
+    <p>The museum received little funding and less press, but it drew a particular kind of visitor — people who paused long before each case, who leaned close to read the handwritten labels, who sometimes had to step outside for air. These visitors understood, without being told, that the ordinary was not the opposite of significant. It was significance in its most honest form.</p>
+    <p>Dr. Nair often said that the job of the curator was not to tell people what to feel. It was to create conditions in which feeling became possible.</p>`
+  }
+};
+
+// ===== MOCK TEST DATA =====
+const MOCKS = [
+  // MOCK 1 — 50 questions
+  {
+    id:1,
+    title:"Mock Test 1",
+    questions:[
+      // RC1: Narrative (Q1-Q4) — Sabyasachi
+      {id:1,section:"rc",passage:"m1p1",text:"The passage is primarily concerned with:-",opts:["Sabyasachi's perseverance","The city of Kolkata","The Royal Bengal tiger","Mukherjee's childhood as a Bengali boy"],correct:0,exp:"The passage focuses on how Sabyasachi persevered despite being advised to leave Kolkata, and built global success from there. The central theme is his stubborn determination."},
+      {id:2,section:"rc",passage:"m1p1",text:"Mukherjee 'turned the narrative on its head' means he:-",opts:["began to design clothes for locals","continued to salute Kolkata with more fervour","became a huge success without leaving Kolkata","was too confident about his designs"],correct:2,exp:"'Turning the narrative on its head' means reversing the expected outcome. Instead of leaving like others, he stayed in Kolkata and achieved global success from there."},
+      {id:3,section:"rc",passage:"m1p1",text:"Choose a word from the passage to fill in the blank: With the advent of AI, the world of innovation and technology is at the ______ of astounding progress.",opts:["suburb","care","cusp","rolling stones"],correct:2,exp:"'Cusp' means on the verge or edge of something. The passage uses 'on the cusp of celebrating 25 years' which fits the blank perfectly."},
+      {id:4,section:"rc",passage:"m1p1",text:"As per the passage Sabyasachi Mukherjee is:-",opts:["A show-off","A vain man","A braggart","An unassuming man"],correct:3,exp:"The passage begins by saying Mukherjee is 'refreshingly unromantic about his achievements' and describes his modesty as engaging. An unassuming man is modest and does not boast."},
+      // RC2: Factual (Q5-Q8) — Renewable Energy
+      {id:5,section:"rc",passage:"m1p2",text:"Renewable energy contributes to economic growth by ___________.",opts:["creating jobs and new industries","increasing fossil fuel exports","reducing investment in technology","decreasing the need for energy conservation"],correct:0,exp:"The passage explicitly states: 'By investing in renewables, nations do not only address environmental concerns but also create jobs and drive economic growth.'"},
+      {id:6,section:"rc",passage:"m1p2",text:"Renewable energy sources are considered environmentally friendly because ___________.",opts:["they produce comparatively higher quality energy","they are inexpensive to set up","they have minimal harmful emissions","they are unaffected by weather conditions"],correct:2,exp:"The passage states renewable energy sources are 'sustainable and environmentally friendly' in contrast to fossil fuels which 'release harmful greenhouse gases when burned.'"},
+      {id:7,section:"rc",passage:"m1p2",text:"The shift towards renewable energy is essential for ___________.",opts:["replacing all forms of energy storage","ending global industrial activities","maintaining reliance on fossil fuels","ensuring energy security and sustainability"],correct:3,exp:"The passage states one key advantage is 'its ability to provide energy security' since resources are naturally replenished and do not run out."},
+      {id:8,section:"rc",passage:"m1p2",text:"India is leading the global renewable energy efforts through ________.",opts:["the International Solar Alliance","hydropower exports to neighboring countries","investments in fossil fuel alternatives","advancements in wind turbine design"],correct:0,exp:"The passage explicitly mentions: 'With initiatives like the International Solar Alliance, the country is leading global efforts to harness the power of the sun.'"},
+      // RC3: Literary (Q9-Q12) — Violin
+      {id:9,section:"rc",passage:"m1p3",text:"Identify the figure of speech: \"The golden sunset bathed the town in amber light\".",opts:["Simile","Alliteration","Pun","Metaphor"],correct:3,exp:"This is a metaphor — the sunset is described as 'bathing' the town, attributing a human action to a natural phenomenon without using 'like' or 'as'. It also involves personification."},
+      {id:10,section:"rc",passage:"m1p3",text:"Examine the deeper meaning of, 'the violin's echoes in the town':-",opts:["They prove that music has no real impact on people's lives.","They represent the return of a long-lost musical tradition.","They show that only trained musicians can bring joy through music.","They signify that the violin had magical powers which failed to enamour people."],correct:1,exp:"The passage describes how the town had been 'once indifferent' but 'paused to listen as music danced through its streets.' The echoes represent a revival of music and community connection."},
+      {id:11,section:"rc",passage:"m1p3",text:"Evaluate the role of music in Karan's transformation:-",opts:["It helped him discover his purpose and connect with the town.","It distracted him from his true calling in life trying to bring about a change.","It was just a temporary hobby that he soon had to abandon silently.","It created distance between him and Mr. Mehra and led to a lot of misconceptions."],correct:0,exp:"Music gave Karan direction and purpose. He went from a curious boy to a professional musician who preserved Mr. Mehra's legacy, clearly discovering his calling through music."},
+      {id:12,section:"rc",passage:"m1p3",text:"The transformation that occurred in the town as Karan learned the violin:-",opts:["The town ignored his music, finding it ordinary and unremarkable.","The townspeople disapproved of music and asked him to stop.","The melodies flowing through the streets brought warmth and appreciation.","The violin's sound was too weak and unimpressive to make an impact on anyone."],correct:2,exp:"The passage says 'The town, once indifferent, paused to listen as music danced through its streets.' This shows the town's transformation from indifference to appreciation."},
+      // Para Jumbles (Q13, Q18, Q27, Q29, Q37, Q38, Q44, Q47)
+      {id:13,section:"parajumble",passage:null,text:"Rearrange the following parts to form a meaningful sentence:\n(A) endurance requiring participants to develop skills and\n(B) adventure sports provide an adrenaline rush and\n(C) confidence while ensuring safety through proper guidelines\n(D) excitement as they challenge both mental and physical",opts:["(A), (B), (C), (D)","(A), (B), (D), (C)","(B), (A), (C), (D)","(B), (D), (A), (C)"],correct:3,exp:"The correct order is B→D→A→C: 'Adventure sports provide an adrenaline rush and excitement as they challenge both mental and physical endurance requiring participants to develop skills and confidence while ensuring safety through proper guidelines.'"},
+      // Vocabulary: Match (Q14, Q19)
+      {id:14,section:"vocab",passage:null,text:"Match the words in List-I with their meanings in List-II:\n(A) Exaltation → (B) Resurrection → (C) Semantic → (D) Lassitude\n(I) Related to meaning in language  (II) Lack of energy  (III) Great Joy  (IV) A new beginning once again",opts:["(A)-(III),(B)-(IV),(C)-(I),(D)-(II)","(A)-(IV),(B)-(II),(C)-(III),(D)-(I)","(A)-(I),(B)-(II),(C)-(IV),(D)-(III)","(A)-(III),(B)-(IV),(C)-(II),(D)-(I)"],correct:3,exp:"Exaltation = Great Joy (III); Resurrection = A new beginning/revival (IV); Semantic = Related to meaning in language (I) — but C should be II (Lack of energy) is Lassitude. Correct: A-III, B-IV, C-I, D-II. Option 1 matches this."},
+      // Synonym (Q15, Q16, Q34, Q41, Q45)
+      {id:15,section:"vocab",passage:null,text:"Select the correct synonym for the word: Procrastinate.",opts:["Expedite","Discuss","Defer","Elevate"],correct:2,exp:"Procrastinate means to delay or postpone something. 'Defer' means to put off or delay, making it the closest synonym. 'Expedite' is an antonym (to speed up)."},
+      {id:16,section:"vocab",passage:null,text:"Select the correct synonym for the word: Mediocrity",opts:["Brilliant","Average","Middle","Very poor"],correct:3,exp:"Mediocrity refers to the quality of being mediocre — of a very moderate, barely adequate standard. 'Average' is close but 'very poor quality' better captures the negative connotation of mediocrity."},
+      // Grammar (Q17, Q20, Q24, Q31, Q48, Q49)
+      {id:17,section:"grammar",passage:null,text:"Choose the correct preposition: Saaya's Institute is situated ___ the junction near the city hall.",opts:["on","at","over","in"],correct:1,exp:"'At' is used for specific points or locations. 'At the junction' is the standard prepositional usage. 'On' would be used for surfaces, 'in' for enclosed spaces."},
+      // Para Jumble
+      {id:18,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) communication while exposing individuals to diverse cultures\n(B) learning new languages enhances cognitive abilities and\n(C) and expanding career opportunities in global markets\n(D) worldwide helping them connect with people more effectively",opts:["(A),(C),(B),(D)","(A),(B),(C),(D)","(B),(A),(D),(C)","(C),(B),(D),(A)"],correct:2,exp:"The correct order is B→A→D→C: 'Learning new languages enhances cognitive abilities and communication while exposing individuals to diverse cultures worldwide helping them connect with people more effectively and expanding career opportunities in global markets.'"},
+      // Vocabulary Match
+      {id:19,section:"vocab",passage:null,text:"Match List-I (Sentences) with List-II (Words):\n(A) Introductory section of a literary work → (B) Speaking aloud by a character → (C) Speech delivered without preparation → (D) Summary of a written work\n(I) Soliloquy  (II) Epitome  (III) Prologue  (IV) Extempore",opts:["(A)-(III),(B)-(I),(C)-(IV),(D)-(II)","(A)-(II),(B)-(III),(C)-(I),(D)-(IV)","(A)-(I),(B)-(II),(C)-(IV),(D)-(III)","(A)-(III),(B)-(I),(C)-(IV),(D)-(II)"],correct:0,exp:"Prologue = introductory section (III→A); Soliloquy = speaking aloud by character (I→B); Extempore = speech without preparation (IV→C); Epitome = summary or embodiment (II→D). So A-III, B-I, C-IV, D-II."},
+      // Grammar - confusables
+      {id:20,section:"grammar",passage:null,text:"Choose the correct option to fill in the blank: The teacher will ______ the student's performance before giving the final grades.",opts:["approx.","Appraise","Apprise","Praise"],correct:1,exp:"'Appraise' means to evaluate or assess the value/quality of something. 'Apprise' means to inform someone about something. The teacher is evaluating performance, so 'appraise' is correct."},
+      // Vocab - Fill blanks matching
+      {id:21,section:"vocab",passage:null,text:"Fill in the blanks (List-I) with appropriate words (List-II):\n(A) We took a _____ across the river  (B) Cinderella's _____ godmother  (C) The moss was soft and _____ to touch  (D) The raft could not withstand the _____ of the storm\n(I) furry  (II) fury  (III) ferry  (IV) fairy",opts:["(A)-(I),(B)-(II),(C)-(III),(D)-(IV)","(A)-(IV),(B)-(II),(C)-(III),(D)-(I)","(A)-(III),(B)-(IV),(C)-(I),(D)-(II)","(A)-(III),(B)-(IV),(C)-(I),(D)-(II)"],correct:3,exp:"Ferry = boat for crossing (A-III); Fairy = magical creature (B-IV); Furry = soft and fluffy (C-I); Fury = intense anger/force (D-II)."},
+      // Antonym
+      {id:22,section:"vocab",passage:null,text:"Choose the most appropriate antonym for the word: Belligerence.",opts:["Argument","Quarrel","Pacifism","Contention"],correct:2,exp:"Belligerence means aggressive or warlike behaviour. Its antonym is Pacifism — the belief in peaceful resolution of conflicts and opposition to war or violence."},
+      // Idioms & Phrases
+      {id:23,section:"idioms",passage:null,text:"Choose the appropriate proverb to complete the sentence: Aruna refused to rush into a decision, believing in the saying, _______.",opts:["A leopard never changes its spots","Too many cooks spoil the broth","The early bird catches the worm","Look before you leap"],correct:3,exp:"'Look before you leap' means think carefully before taking action. Aruna is refusing to rush, so she believes in careful consideration before deciding — perfectly matching this proverb."},
+      // Grammar - prepositions/phrases
+      {id:24,section:"grammar",passage:null,text:"Fill in the blank with the most appropriate option: The new law was introduced __ increasing concerns about public safety.",opts:["by way of","in accordance with","in the light of","on behalf of"],correct:2,exp:"'In the light of' means because of, or taking into consideration. The law was introduced because of (in light of) increasing concerns. This is the most appropriate phrase here."},
+      // Antonym
+      {id:25,section:"vocab",passage:null,text:"Choose the correct antonym of the underlined word: The lavish lifestyle of the minister took the public by surprise.",opts:["elaborate","excessive","hectic","frugal"],correct:3,exp:"Lavish means spending money in large amounts extravagantly. Its antonym is 'frugal' which means spending only as much as necessary, being careful about money."},
+      // One-word substitution
+      {id:26,section:"vocab",passage:null,text:"Choose the best option that explains the given statement in one word: The study of human race especially of its origins, development, customs and beliefs.",opts:["Anthropology","Anthromorphic","Anthology","Anthropoid"],correct:0,exp:"Anthropology is the study of human societies, cultures, and their development. It covers human origins, customs, beliefs, and social behaviour."},
+      // Para Jumble
+      {id:27,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) popular providing access to learning across the\n(B) revolutionising traditional teaching methods globally\n(C) online education has become increasingly\n(D) world through digital platforms and virtual classrooms",opts:["(B),(C),(A),(D)","(D),(C),(B),(A)","(B),(A),(D),(C)","(C),(A),(D),(B)"],correct:3,exp:"The correct order is C→A→D→B: 'Online education has become increasingly popular providing access to learning across the world through digital platforms and virtual classrooms revolutionising traditional teaching methods globally.'"},
+      // Idiom
+      {id:28,section:"idioms",passage:null,text:"Choose the correct idiom to fill in the blank: Despite losing the match, he told himself to ______ and try again next time.",opts:["break the ice","keep a stiff upper lip","turn a blind eye","spill the beans"],correct:1,exp:"'Keep a stiff upper lip' means to remain brave and controlled in a difficult situation without showing emotions. It perfectly suits the context of maintaining composure after a loss."},
+      // Para Jumble
+      {id:29,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) the skies, experiencing breathtaking views of vast\n(B) paragliding allows adventure seekers to soar through\n(C) favourable weather conditions to ensure a safe flight\n(D) landscapes, while requiring proper training and",opts:["(B),(D),(C),(A)","(C),(B),(A),(D)","(B),(A),(D),(C)","(A),(C),(B),(D)"],correct:2,exp:"The correct order is B→A→D→C: 'Paragliding allows adventure seekers to soar through the skies, experiencing breathtaking views of vast landscapes, while requiring proper training and favourable weather conditions to ensure a safe flight.'"},
+      // Grammar - Adverbs matching
+      {id:30,section:"grammar",passage:null,text:"Fill blanks (List-I) with adverbs (List-II):\n(A) Arti spoke so_____ that the audience was mesmerized\n(B) Akash _____ agreed to apologize after much persuasion\n(C) My parents _____ remembered meeting Shyam years ago\n(D) The officer walked _____ towards the crime scene\n(I) vaguely  (II) briskly  (III) eloquently  (IV) reluctantly",opts:["(A)-(III),(B)-(I),(C)-(II),(D)-(IV)","(A)-(II),(B)-(III),(C)-(I),(D)-(IV)","(A)-(I),(B)-(II),(C)-(IV),(D)-(III)","(A)-(III),(B)-(IV),(C)-(I),(D)-(II)"],correct:3,exp:"Eloquently (III) = speaking beautifully (A); Reluctantly (IV) = unwillingly (B); Vaguely (I) = unclearly (C); Briskly (II) = quickly and energetically (D). So A-III, B-IV, C-I, D-II."},
+      // Grammar - Vocabulary
+      {id:31,section:"grammar",passage:null,text:"Select the most appropriate option to fill in the blank: Ashu completed the project __, ensuring that every detail was perfect.",opts:["lethargically","abruptly","recklessly","meticulously"],correct:3,exp:"Meticulously means showing great attention to detail. If every detail was perfect, the work was done meticulously. Lethargically (slowly), abruptly (suddenly), and recklessly (carelessly) all contradict the context."},
+      // Antonym
+      {id:32,section:"vocab",passage:null,text:"Choose the correct antonym of the underlined word: Nature provides us with moments of sublime pleasures.",opts:["lofty","exalted","mundane","fleeting"],correct:2,exp:"Sublime means of very great excellence or beauty. Its antonym is 'mundane' which means lacking interest or excitement, ordinary. 'Lofty' and 'exalted' are synonyms of sublime."},
+      // Idiom - Match phrases
+      {id:33,section:"idioms",passage:null,text:"Match phrases (List-I) with meanings (List-II):\n(A) Bad mouth  (B) In the soup  (C) Call a spade a spade  (D) Sugar coating\n(I) Softening the expression  (II) Straightforward talking  (III) In trouble  (IV) Insult and criticise",opts:["(A)-(I),(B)-(II),(C)-(III),(D)-(IV)","(A)-(I),(B)-(II),(C)-(IV),(D)-(III)","(A)-(IV),(B)-(III),(C)-(II),(D)-(I)","(A)-(III),(B)-(IV),(C)-(I),(D)-(II)"],correct:2,exp:"Bad mouth = Insult and criticise (IV); In the soup = In trouble (III); Call a spade a spade = Straightforward talking (II); Sugar coating = Softening the expression (I). So A-IV, B-III, C-II, D-I."},
+      // Synonym
+      {id:34,section:"vocab",passage:null,text:"Select the correct synonym for the word: Sanguinity.",opts:["Optimism","Skepticism","Pragmatism","Opulence"],correct:0,exp:"Sanguinity (or sanguineness) means optimism about a situation especially when things look bad. The direct synonym is 'optimism' — a positive outlook on life and circumstances."},
+      // Antonym
+      {id:35,section:"vocab",passage:null,text:"Choose the word that is the closest antonym of the underlined word: Considering how terrible the situation was, her levity was appalling.",opts:["frivolity","witticism","criticism","gravity"],correct:3,exp:"Levity means treating serious things with a lack of respect. Its antonym is 'gravity' which means seriousness or solemnity. Frivolity is a synonym of levity."},
+      // Vocab - Fill blanks (List matching)
+      {id:36,section:"vocab",passage:null,text:"Fill the blanks (List-I) with suitable words (List-II):\n(A) Asha was caught trying to _____ evidence\n(B) The professor _____ every detail of the research paper\n(C) The storm _____ entire villages\n(D) The government decided to _____ the outdated law\n(I) obliterated  (II) fabricate  (III) repeal  (IV) scrutinised",opts:["(A)-(I),(B)-(II),(C)-(III),(D)-(IV)","(A)-(II),(B)-(IV),(C)-(I),(D)-(III)","(A)-(I),(B)-(II),(C)-(IV),(D)-(III)","(A)-(III),(B)-(IV),(C)-(I),(D)-(II)"],correct:1,exp:"Fabricate = to invent false evidence (A-II); Scrutinised = examined carefully (B-IV); Obliterated = completely destroyed (C-I); Repeal = to officially revoke a law (D-III). So A-II, B-IV, C-I, D-III."},
+      // Para Jumble
+      {id:37,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) opportunities for young players to showcase their skills\n(B) modern cricket, attracting global talent, generating\n(C) the Indian Premier League has revolutionised\n(D) massive fan engagement, and creating new",opts:["(A),(C),(B),(D)","(C),(B),(D),(A)","(D),(B),(C),(A)","(A),(D),(C),(B)"],correct:1,exp:"The correct order is C→B→D→A: 'The Indian Premier League has revolutionised modern cricket, attracting global talent, generating massive fan engagement, and creating new opportunities for young players to showcase their skills.'"},
+      // Para Jumble
+      {id:38,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) practices to protect the natural and historical heritage\n(B) transformed economies, boosted cultural exchange across\n(C) the rapid expansion of travel and tourism has\n(D) nations, and emphasised the need for sustainable",opts:["(C),(B),(D),(A)","(A),(D),(B),(C)","(B),(A),(D),(C)","(D),(C),(A),(B)"],correct:0,exp:"The correct order is C→B→D→A: 'The rapid expansion of travel and tourism has transformed economies, boosted cultural exchange across nations, and emphasised the need for sustainable practices to protect the natural and historical heritage.'"},
+      // Antonym
+      {id:39,section:"vocab",passage:null,text:"Choose the correct antonym for the word: Obsolete.",opts:["Antiquated","Archaic","Current","Absolute"],correct:2,exp:"Obsolete means no longer produced or used; out of date. Its antonym is 'current' meaning belonging to the present time, in use now. Antiquated and archaic are synonyms of obsolete."},
+      // Idiom (phrases matching)
+      {id:40,section:"idioms",passage:null,text:"Fill phrases (List-I) in blanks (List-II):\n(A) by dint of  (B) In order to  (C) On behalf of  (D) In lieu of\n(I) _____ avoid litigation, he accepted the settlement money\n(II) Fighting _____ his country, he achieved martyrdom\n(III) Radha succeeded _____ perseverance and hard work\n(IV) Sameer accepted the car _____ his claimed money",opts:["(A)-(III),(B)-(I),(C)-(II),(D)-(IV)","(A)-(I),(B)-(IV),(C)-(III),(D)-(II)","(A)-(I),(B)-(II),(C)-(IV),(D)-(III)","(A)-(III),(B)-(IV),(C)-(I),(D)-(II)"],correct:3,exp:"'By dint of' = by means of (A-III: succeeded by means of perseverance); 'In order to' = for the purpose of (B-IV: acceptable usage); 'On behalf of' = representing (C-I: to avoid litigation); 'In lieu of' = instead of (D-II). Correct: A-III, B-IV, C-I, D-II."},
+      // Synonym
+      {id:41,section:"vocab",passage:null,text:"Select the correct synonym for the word: Temerity",opts:["Caution","audacity","Circumspection","fulfillment"],correct:1,exp:"Temerity means excessive confidence or boldness; recklessness. 'Audacity' means boldness or daring, making it the closest synonym. Caution and circumspection are antonyms."},
+      // Literary devices (matching)
+      {id:42,section:"literary",passage:null,text:"Match figures of speech (List-I) with definitions (List-II):\n(A) Metaphor  (B) Personification  (C) Hyperbole  (D) Oxymoron\n(I) Giving human qualities to non-human objects\n(II) A phrase combining contradictory words\n(III) An imaginative comparison without 'like' or 'as'\n(IV) An exaggerated statement not meant literally",opts:["(A)-(I),(B)-(III),(C)-(II),(D)-(IV)","(A)-(III),(B)-(I),(C)-(IV),(D)-(II)","(A)-(I),(B)-(IV),(C)-(II),(D)-(III)","(A)-(III),(B)-(IV),(C)-(I),(D)-(II)"],correct:1,exp:"Metaphor = imaginative comparison without 'like'/'as' (III); Personification = giving human qualities to non-human things (I); Hyperbole = exaggerated statement not meant literally (IV); Oxymoron = contradictory words together (II). So A-III, B-I, C-IV, D-II."},
+      // Phrasal verbs (matching)
+      {id:43,section:"vocab",passage:null,text:"Match phrasal verbs (List-I) with meanings (List-II):\n(A) Turn Down  (B) Put Up With  (C) Burn out  (D) Pass Out\n(I) Tolerate  (II) Reject  (III) Become Unconscious  (IV) Exhausted",opts:["(A)-(I),(B)-(II),(C)-(III),(D)-(IV)","(A)-(IV),(B)-(II),(C)-(III),(D)-(I)","(A)-(II),(B)-(I),(C)-(IV),(D)-(III)","(A)-(III),(B)-(IV),(C)-(I),(D)-(II)"],correct:2,exp:"Turn Down = Reject (II); Put Up With = Tolerate (I); Burn out = Exhausted (IV); Pass Out = Become Unconscious (III). So A-II, B-I, C-IV, D-III."},
+      // Para Jumble
+      {id:44,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) expansion, putting sensitive data at significant risk\n(B) cyber threats have increased due to digital\n(C) to protect individuals and organizations worldwide\n(D) requiring stronger security measures and protocols",opts:["(B),(A),(C),(D)","(A),(B),(C),(D)","(B),(A),(D),(C)","(C),(B),(D),(A)"],correct:0,exp:"The correct order is B→A→C→D: 'Cyber threats have increased due to digital expansion, putting sensitive data at significant risk to protect individuals and organizations worldwide requiring stronger security measures and protocols.'"},
+      // Synonym in context
+      {id:45,section:"vocab",passage:null,text:"Choose the most appropriate synonym of the underlined word: His irascible behaviour did not win him any favours.",opts:["honest","upright","controlling","ill-tempered"],correct:3,exp:"Irascible means having or showing a tendency to be easily angered. 'Ill-tempered' is the closest synonym, as it also describes someone who is irritable and prone to anger."},
+      // Idiom meaning
+      {id:46,section:"idioms",passage:null,text:"Identify the correct meaning of the given idiom: 'Mind your Ps & Qs'",opts:["To be afraid of doing wrong.","To be very careful with our actions and expressions.","To finish or complete a project","To love our neighbours."],correct:1,exp:"'Mind your Ps and Qs' means to be careful about your behaviour and manners, to be mindful of how you speak and act in social situations."},
+      // Para Jumble
+      {id:47,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) determination as climbers must endure harsh weather\n(B) and push their physical limits to reach the summit\n(C) conditions to navigate steep and unpredictable terrains\n(D) mountaineering requires patience, skill, and",opts:["(A),(B),(C),(D)","(A),(C),(D),(B)","(B),(D),(C),(A)","(D),(A),(C),(B)"],correct:3,exp:"The correct order is D→A→C→B: 'Mountaineering requires patience, skill, and determination as climbers must endure harsh weather conditions to navigate steep and unpredictable terrains and push their physical limits to reach the summit.'"},
+      // Grammar - connectors
+      {id:48,section:"grammar",passage:null,text:"Choose the correct word from the given options to complete the sentence: ______ they are poor, they are honest.",opts:["Despite","Thorough","Though","While"],correct:2,exp:"'Though' (or although) introduces a contrast clause. 'Though they are poor, they are honest' correctly contrasts their economic status with their moral character. 'Despite' requires a noun phrase, not a clause."},
+      // Grammar - word usage
+      {id:49,section:"grammar",passage:null,text:"Choose the correct word from the given options to complete the sentence: Alice ______, \"How blessed I'm to be here today!\"",opts:["addressed","exclaimed","imagined","described"],correct:1,exp:"'Exclaimed' is the appropriate speech verb here because the sentence contains an exclamatory statement with strong emotion. When someone speaks with excitement or strong feeling, they 'exclaim'."},
+      // Phrasal verbs (fill blanks matching)
+      {id:50,section:"vocab",passage:null,text:"Fill blanks (List-I) with phrasal verbs (List-II):\n(A) Akash hesitated to _____ the topic of salary\n(B) Asha decided to _____ the job offer due to low salary\n(C) Leaders met to _____ their differences and reach agreement\n(D) The burglar tried to _____ with shoplifting but was caught\n(I) turn down  (II) iron out  (III) get away  (IV) bring up",opts:["(A)-(I),(B)-(II),(C)-(IV),(D)-(III)","(A)-(IV),(B)-(II),(C)-(III),(D)-(I)","(A)-(IV),(B)-(I),(C)-(II),(D)-(III)","(A)-(I),(B)-(IV),(C)-(II),(D)-(III)"],correct:2,exp:"Bring up = raise a topic (A-IV); Turn down = reject (B-I); Iron out = resolve differences (C-II); Get away = escape (D-III). So A-IV, B-I, C-II, D-III."}
+    ]
+  },
+  // MOCK 2
+  {
+    id:2,
+    title:"Mock Test 2",
+    questions:[
+      // RC1: Factual (Q1-Q4) — Reading
+      {id:1,section:"rc",passage:"m2p1",text:"According to the passage, regular reading primarily strengthens:-",opts:["physical health and endurance","cognitive abilities and communication skills","financial planning and budgeting","social media skills and digital literacy"],correct:1,exp:"The passage states: 'Research consistently shows that regular reading strengthens cognitive abilities. It expands vocabulary, sharpens comprehension, and enhances critical thinking.'"},
+      {id:2,section:"rc",passage:"m2p1",text:"The passage suggests that reading fiction specifically helps in:-",opts:["improving mathematical reasoning","developing empathy through different perspectives","learning foreign languages","advancing scientific knowledge"],correct:1,exp:"The passage explicitly states: 'Moreover, reading fiction develops empathy by allowing readers to inhabit the perspective of diverse characters and experiences.'"},
+      {id:3,section:"rc",passage:"m2p1",text:"What does the passage identify as a primary reason for declining reading rates among Indian youth?",opts:["Lack of access to books","Proliferation of social media and short-form content","Insufficient school libraries","High prices of books"],correct:1,exp:"The passage states: 'reading rates among Indian youth have declined in recent decades, partly due to the proliferation of social media and short-form content.'"},
+      {id:4,section:"rc",passage:"m2p1",text:"The word 'proliferation' in the passage most likely means:-",opts:["reduction","rapid increase and spread","strict control","careful management"],correct:1,exp:"Proliferation means rapid increase in numbers or spread. In context, social media has rapidly increased and spread, which has affected reading habits. The prefix 'pro' and Latin root 'proles' (offspring) suggest growth."},
+      // RC2: Narrative (Q5-Q8) — Lighthouse
+      {id:5,section:"rc",passage:"m2p2",text:"The phrase 'quiet stoicism' used to describe Rajan's response to the letter suggests he:-",opts:["was openly devastated and wept","showed no emotion on the surface despite inner pain","celebrated the news with his colleagues","immediately began planning his retirement activities"],correct:1,exp:"Stoicism refers to enduring pain and hardship without showing feelings. 'Quiet stoicism' implies Rajan accepted the news calmly on the surface despite likely feeling deeply affected."},
+      {id:6,section:"rc",passage:"m2p2",text:"What does Rajan's act of lighting the lamp manually on his final night symbolise?",opts:["His anger at being replaced by automation","His adherence to duty and personal ritual even at the end","His desire to damage the automated equipment","His hope that the government would change its decision"],correct:1,exp:"Rajan lights the lamp manually 'as he had thousands of times before' — this act symbolises his dedication, his ritual, and his identity as a keeper. It is a final act of devotion to his duty."},
+      {id:7,section:"rc",passage:"m2p2",text:"The weathered notebook Rajan carries represents:-",opts:["his complaints against the government policy","evidence he could use in a legal dispute","decades of irreplaceable personal knowledge and observations","his plans for writing a memoir about lighthouse life"],correct:2,exp:"The notebook contains 'decades of observations — the height of waves, the direction of storms, the names of ships.' It represents knowledge accumulated through human experience that no automated system can replicate."},
+      {id:8,section:"rc",passage:"m2p2",text:"What is the central irony of the fishing vessel steering safely into harbour?",opts:["The crew knew Rajan and came to bid him farewell","Rajan was unaware the vessel was in the harbour","The vessel was the one that brought the government letter","The crew was saved by a vigil being kept on their behalf by someone whose job was being eliminated"],correct:3,exp:"The irony is that Rajan is performing his duty one last time — guiding a vessel safely home — even as that very duty is being taken from him. The crew doesn't know they're being served by someone whose job is ending."},
+      // RC3: Literary (Q9-Q12) — Silence
+      {id:9,section:"rc",passage:"m2p3",text:"The simile 'silence that had grown thick over the years like moss on stone' suggests:-",opts:["the old woman was gradually becoming physically heavier","her silence was natural and had accumulated gradually over time","she was deliberately refusing to speak to Priya","the house had not been cleaned for years"],correct:1,exp:"The simile compares the old woman's silence to moss growing slowly on stone — both grow organically over time without force. The silence has accumulated naturally over her years of loss and isolation."},
+      {id:10,section:"rc",passage:"m2p3",text:"The description of the old woman's hands as 'folded in her lap like sleeping birds' is an example of:-",opts:["Simile","Hyperbole","Alliteration","Onomatopoeia"],correct:0,exp:"This is a simile — it compares her folded hands to sleeping birds using the word 'like'. A simile makes a comparison using 'like' or 'as', distinguishing it from a metaphor."},
+      {id:11,section:"rc",passage:"m2p3",text:"What causes the old woman's eyes to 'clear' for a moment when she hears Priya's question?",opts:["She recognises the tune from her favourite film","The song connects her to a vivid and personal memory","She is startled by Priya's loud voice","She wants to change the subject of conversation"],correct:1,exp:"The old woman's eyes clear because the song triggers a deep personal memory — it was a song her husband taught her 'On the day we left everything behind.' The song pierces through her habitual distance."},
+      {id:12,section:"rc",passage:"m2p3",text:"The passage ends with the phrase 'all that endured.' What is the author suggesting 'endures' between the two women?",opts:["Their shared love of music","A bond of love, memory, and connection across generations","Their mutual discomfort with difficult subjects","Their wish for the grandfather to return"],correct:1,exp:"The story ends with grandmother and granddaughter sitting together, connected by the grandfather's song. What endures is love, memory, and the bond between generations — carried forward through small moments like a shared song."},
+      // Para Jumbles
+      {id:13,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) to maintain global ecological balance and\n(B) biodiversity conservation has become essential\n(C) prevent the extinction of countless species\n(D) due to accelerating climate change and habitat loss",opts:["(B),(D),(A),(C)","(A),(B),(D),(C)","(D),(A),(B),(C)","(B),(A),(D),(C)"],correct:0,exp:"The correct order is B→D→A→C: 'Biodiversity conservation has become essential due to accelerating climate change and habitat loss to maintain global ecological balance and prevent the extinction of countless species.'"},
+      // Vocabulary
+      {id:14,section:"vocab",passage:null,text:"Select the correct synonym for the word: Ameliorate.",opts:["Worsen","Improve","Preserve","Evaluate"],correct:1,exp:"Ameliorate means to make something bad or unsatisfactory better. Its synonym is 'improve.' The prefix 'ameli-' comes from Latin 'melior' meaning better."},
+      {id:15,section:"vocab",passage:null,text:"Choose the most appropriate antonym for the word: Ephemeral.",opts:["Transient","Fleeting","Permanent","Momentary"],correct:2,exp:"Ephemeral means lasting for a very short time. Its antonym is 'permanent' meaning lasting or intended to last indefinitely. Transient, fleeting, and momentary are all synonyms of ephemeral."},
+      {id:16,section:"vocab",passage:null,text:"Select the correct synonym for the word: Laconic.",opts:["Verbose","Concise","Elaborate","Descriptive"],correct:1,exp:"Laconic means using very few words; brief and to the point. Its synonym is 'concise.' 'Verbose' and 'elaborate' are antonyms."},
+      // Grammar
+      {id:17,section:"grammar",passage:null,text:"Choose the correct option: The committee has reached ___ unanimous decision after hours of deliberation.",opts:["a","an","the","no article"],correct:1,exp:"'Unanimous' starts with the vowel sound 'u' (pronounced 'yoo-nan-i-mous'). However, since it begins with a consonant sound /j/, 'a' is technically used. But the standard rule is that 'unanimous' takes 'a' not 'an'. The answer is 'a'."},
+      {id:18,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) and fostering cross-cultural understanding worldwide\n(B) the United Nations works tirelessly\n(C) to promote international peace, resolve conflicts,\n(D) through dialogue, diplomacy, and cooperation",opts:["(B),(C),(D),(A)","(A),(B),(C),(D)","(D),(B),(A),(C)","(C),(A),(B),(D)"],correct:0,exp:"The correct order is B→C→D→A: 'The United Nations works tirelessly to promote international peace, resolve conflicts, through dialogue, diplomacy, and cooperation and fostering cross-cultural understanding worldwide.'"},
+      {id:19,section:"vocab",passage:null,text:"Match List-I (Words) with List-II (Meanings):\n(A) Zenith → (B) Nadir → (C) Ephemeral → (D) Perpetual\n(I) Lowest point  (II) Short-lived  (III) Highest point  (IV) Continuous",opts:["(A)-(III),(B)-(I),(C)-(II),(D)-(IV)","(A)-(I),(B)-(III),(C)-(IV),(D)-(II)","(A)-(II),(B)-(IV),(C)-(I),(D)-(III)","(A)-(IV),(B)-(II),(C)-(III),(D)-(I)"],correct:0,exp:"Zenith = highest point (III); Nadir = lowest point (I); Ephemeral = short-lived (II); Perpetual = continuous/everlasting (IV). So A-III, B-I, C-II, D-IV."},
+      {id:20,section:"grammar",passage:null,text:"Choose the correct option to fill in the blank: She ______ to the conference every year since 2015.",opts:["goes","has been going","went","is going"],correct:1,exp:"'Since 2015' indicates an action that began in the past and continues to the present. This requires the present perfect continuous tense: 'has been going.' This expresses continuity from past to present."},
+      {id:21,section:"vocab",passage:null,text:"Choose the best one-word substitute: One who is able to use both hands equally well.",opts:["Ambiguous","Ambidextrous","Amphibian","Ambivalent"],correct:1,exp:"Ambidextrous describes a person who can use both hands with equal skill. From Latin 'ambi' (both) + 'dexter' (right/skilled). Ambiguous means unclear; ambivalent means having mixed feelings."},
+      {id:22,section:"vocab",passage:null,text:"Choose the most appropriate antonym for the word: Frugality.",opts:["Thrift","Parsimony","Extravagance","Economy"],correct:2,exp:"Frugality means the quality of being economical with money or food. Its antonym is 'extravagance' — excessive expenditure or elaborateness. Thrift and parsimony are synonyms."},
+      {id:23,section:"idioms",passage:null,text:"Identify the correct meaning of the idiom: 'Bite the bullet'",opts:["To eat something unusual","To face a painful situation bravely","To make an impulsive decision","To regret a past action"],correct:1,exp:"'Bite the bullet' means to endure a painful or difficult situation courageously. The phrase originates from the practice of having patients bite on a bullet during surgery to cope with pain."},
+      {id:24,section:"grammar",passage:null,text:"Choose the correct option: Neither the manager nor the employees ______ present at the meeting.",opts:["was","were","is","has been"],correct:1,exp:"When using 'neither...nor', the verb agrees with the subject closest to it. Since 'employees' (plural) is closest to the verb, the plural form 'were' is correct."},
+      {id:25,section:"vocab",passage:null,text:"Select the correct synonym for the word: Obdurate.",opts:["Flexible","Compliant","Stubborn","Generous"],correct:2,exp:"Obdurate means stubbornly refusing to change one's opinion or course of action. 'Stubborn' is the most direct synonym. Flexible and compliant are antonyms."},
+      {id:26,section:"vocab",passage:null,text:"Choose the best option that explains the given statement in one word: A person who pretends to have virtues, moral or religious beliefs that they do not actually possess.",opts:["Agnostic","Heretic","Hypocrite","Apostate"],correct:2,exp:"A hypocrite is someone who claims to have moral standards or beliefs to which their own behaviour does not conform. From Greek 'hypokrites' meaning actor or stage player."},
+      {id:27,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) allowing users to connect with loved ones\n(B) social media platforms have revolutionised communication\n(C) and share information in real time across the globe\n(D) breaking geographical barriers,",opts:["(B),(D),(A),(C)","(A),(C),(B),(D)","(D),(B),(C),(A)","(B),(C),(D),(A)"],correct:0,exp:"The correct order is B→D→A→C: 'Social media platforms have revolutionised communication breaking geographical barriers, allowing users to connect with loved ones and share information in real time across the globe.'"},
+      {id:28,section:"idioms",passage:null,text:"Choose the correct idiom: Priya had worked for months on the project, but when her colleague took all the credit, she felt like she had ______.",opts:["bitten off more than she could chew","barked up the wrong tree","burned the midnight oil","cried over spilt milk"],correct:1,exp:"'Barked up the wrong tree' means to pursue a mistaken or misguided course of action. Here, Priya directed her efforts towards a goal (recognition) that went to someone else, suggesting she was pursuing something that didn't materialise."},
+      {id:29,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) reducing air pollution and promoting\n(B) electric vehicles represent a significant step\n(C) a more sustainable transportation ecosystem\n(D) towards clean energy adoption,",opts:["(B),(D),(A),(C)","(A),(C),(D),(B)","(D),(B),(A),(C)","(C),(A),(B),(D)"],correct:0,exp:"The correct order is B→D→A→C: 'Electric vehicles represent a significant step towards clean energy adoption, reducing air pollution and promoting a more sustainable transportation ecosystem.'"},
+      {id:30,section:"grammar",passage:null,text:"Select the most appropriate option: The scientist, along with her research team, ______ the experiment successfully.",opts:["complete","completes","have completed","are completing"],correct:1,exp:"When a singular subject is followed by 'along with + noun phrase', the verb agrees with the main (singular) subject. 'The scientist' is singular, so the verb should be singular: 'completes'."},
+      {id:31,section:"grammar",passage:null,text:"Choose the correct option to fill in the blank: The news of the accident ______ everyone present at the meeting.",opts:["shock","shocked","shocks","have shocked"],correct:1,exp:"'The news' is a singular noun in English (even though it ends in -s). The sentence is in simple past tense based on context. 'Shocked' is the correct simple past form."},
+      {id:32,section:"vocab",passage:null,text:"Choose the correct antonym of the word: Diligent.",opts:["Industrious","Hardworking","Lazy","Persistent"],correct:2,exp:"Diligent means having or showing care and conscientiousness in one's work. Its antonym is 'lazy' — disinclined to activity or exertion. Industrious, hardworking, and persistent are all synonyms."},
+      {id:33,section:"idioms",passage:null,text:"Match idioms (List-I) with meanings (List-II):\n(A) A blessing in disguise  (B) Once in a blue moon  (C) Beat around the bush  (D) On the fence\n(I) Undecided  (II) Something good that seemed bad at first  (III) Very rarely  (IV) Avoiding the main topic",opts:["(A)-(II),(B)-(III),(C)-(IV),(D)-(I)","(A)-(I),(B)-(II),(C)-(III),(D)-(IV)","(A)-(IV),(B)-(I),(C)-(II),(D)-(III)","(A)-(III),(B)-(IV),(C)-(I),(D)-(II)"],correct:0,exp:"A blessing in disguise = something good that seemed bad (II); Once in a blue moon = very rarely (III); Beat around the bush = avoid the main topic (IV); On the fence = undecided (I)."},
+      {id:34,section:"vocab",passage:null,text:"Select the correct synonym for the word: Venerate.",opts:["Despise","Revere","Ignore","Question"],correct:1,exp:"Venerate means to regard with great respect and reverence. Its synonym is 'revere' which means to feel deep respect or admiration for something or someone."},
+      {id:35,section:"vocab",passage:null,text:"Choose the correct antonym of the underlined word: The magnanimous gesture of the billionaire won widespread praise.",opts:["generous","noble","petty","kind"],correct:2,exp:"Magnanimous means generous or forgiving, especially toward a rival or less powerful person. Its antonym is 'petty' — meaning ungenerous in small matters, or of little importance."},
+      {id:36,section:"vocab",passage:null,text:"Fill blanks (List-I) with words (List-II):\n(A) The politician's _____ speech moved the audience deeply\n(B) The artist's latest work showed true _____ talent\n(C) Her _____ attitude helped resolve the conflict quickly\n(D) The chef's _____ dish won the competition unanimously\n(I) eloquent  (II) prodigious  (III) conciliatory  (IV) exquisite",opts:["(A)-(I),(B)-(II),(C)-(III),(D)-(IV)","(A)-(III),(B)-(I),(C)-(IV),(D)-(II)","(A)-(II),(B)-(IV),(C)-(I),(D)-(III)","(A)-(IV),(B)-(III),(C)-(II),(D)-(I)"],correct:0,exp:"Eloquent = fluent and persuasive speech (A-I); Prodigious = impressively great talent (B-II); Conciliatory = intended to make peace (C-III); Exquisite = extremely beautiful dish (D-IV)."},
+      {id:37,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) making it difficult for students to concentrate\n(B) the constant noise from construction outside the school\n(C) on their studies and affecting overall academic performance\n(D) has been a persistent source of disturbance,",opts:["(B),(D),(A),(C)","(A),(C),(B),(D)","(C),(B),(D),(A)","(D),(A),(C),(B)"],correct:0,exp:"The correct order is B→D→A→C: 'The constant noise from construction outside the school has been a persistent source of disturbance, making it difficult for students to concentrate on their studies and affecting overall academic performance.'"},
+      {id:38,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) of renewable energy sources by 2030\n(B) the government has announced plans\n(C) to increase the country's total energy production\n(D) to achieve fifty percent generation through adoption",opts:["(B),(D),(C),(A)","(A),(C),(D),(B)","(B),(C),(D),(A)","(D),(B),(A),(C)"],correct:0,exp:"The correct order is B→D→C→A: 'The government has announced plans to achieve fifty percent generation through adoption of renewable energy sources by 2030 to increase the country's total energy production.'"},
+      {id:39,section:"vocab",passage:null,text:"Choose the correct antonym for the word: Impudent.",opts:["Insolent","Audacious","Respectful","Arrogant"],correct:2,exp:"Impudent means not showing due respect for another person; impertinent. Its antonym is 'respectful' — showing deference and regard for others. Insolent and arrogant are synonyms of impudent."},
+      {id:40,section:"idioms",passage:null,text:"Identify the correct meaning of the idiom: 'Spill the beans'",opts:["To make a mess while cooking","To reveal secret information accidentally","To plant seeds in a garden","To waste food carelessly"],correct:1,exp:"'Spill the beans' means to reveal secret or confidential information, especially inadvertently or indiscreetly. The idiom dates from the early 20th century American English."},
+      {id:41,section:"vocab",passage:null,text:"Select the correct synonym for the word: Pellucid.",opts:["Opaque","Murky","Clear and transparent","Dense"],correct:2,exp:"Pellucid means translucently clear or easily understood. Its synonym is 'clear and transparent.' The root 'lucid' (Latin: lucidus = bright) indicates clarity. Opaque and murky are antonyms."},
+      {id:42,section:"literary",passage:null,text:"Identify the figure of speech: 'The stars danced playfully in the moonlit sky.'",opts:["Simile","Metaphor","Personification","Hyperbole"],correct:2,exp:"This sentence attributes human qualities (dancing playfully) to non-human objects (stars). This is personification — giving human characteristics or emotions to inanimate objects or natural phenomena."},
+      {id:43,section:"vocab",passage:null,text:"Match phrasal verbs (List-I) with meanings (List-II):\n(A) Give in  (B) Take after  (C) Call off  (D) Look into\n(I) Investigate  (II) Cancel  (III) Surrender  (IV) Resemble a parent",opts:["(A)-(III),(B)-(IV),(C)-(II),(D)-(I)","(A)-(I),(B)-(II),(C)-(III),(D)-(IV)","(A)-(IV),(B)-(I),(C)-(III),(D)-(II)","(A)-(II),(B)-(III),(C)-(IV),(D)-(I)"],correct:0,exp:"Give in = surrender or yield (III); Take after = resemble a parent/ancestor (IV); Call off = cancel (II); Look into = investigate (I). So A-III, B-IV, C-II, D-I."},
+      {id:44,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) critical thinking skills and a deeper understanding of\n(B) history education plays a vital role in developing\n(C) the world and the complex factors that shape\n(D) students' ability to analyse past events, fostering",opts:["(B),(D),(A),(C)","(A),(C),(B),(D)","(D),(B),(A),(C)","(B),(A),(D),(C)"],correct:0,exp:"The correct order is B→D→A→C: 'History education plays a vital role in developing students' ability to analyse past events, fostering critical thinking skills and a deeper understanding of the world and the complex factors that shape.'"},
+      {id:45,section:"vocab",passage:null,text:"Choose the most appropriate synonym of the underlined word: The professor's lecture was so abstruse that most students could not follow it.",opts:["interesting","simple","obscure and difficult","popular"],correct:2,exp:"Abstruse means difficult to understand; obscure. 'Obscure and difficult' is the closest synonym. The word comes from Latin 'abstrusus' meaning concealed, hidden."},
+      {id:46,section:"idioms",passage:null,text:"Identify the correct meaning of the idiom: 'The ball is in your court'",opts:["You are playing a sport","It is your turn to take action or make a decision","You have won the game","Someone has made a mistake"],correct:1,exp:"'The ball is in your court' means it is up to you to take the next step, make the next move or decision. The metaphor comes from tennis — when the ball is on your side of the court, it's your turn to play."},
+      {id:47,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) the invention of the printing press\n(B) accelerating the spread of knowledge\n(C) by Johannes Gutenberg in 1440\n(D) transformed communication and literacy across Europe,",opts:["(A),(C),(D),(B)","(C),(A),(B),(D)","(A),(D),(B),(C)","(D),(C),(A),(B)"],correct:0,exp:"The correct order is A→C→D→B: 'The invention of the printing press by Johannes Gutenberg in 1440 transformed communication and literacy across Europe, accelerating the spread of knowledge.'"},
+      {id:48,section:"grammar",passage:null,text:"Choose the correct option to fill in the blank: He would rather ______ at home than go to the party.",opts:["stayed","stays","stay","to stay"],correct:2,exp:"After 'would rather', the bare infinitive (infinitive without 'to') is used. So 'stay' (not 'to stay', 'stayed', or 'stays') is correct."},
+      {id:49,section:"grammar",passage:null,text:"Choose the correct option: If I ______ the answer, I would have told you.",opts:["know","knew","had known","have known"],correct:2,exp:"This is a third conditional sentence (unreal past condition). The structure is: 'If + past perfect, would + have + past participle.' So 'had known' is correct."},
+      {id:50,section:"vocab",passage:null,text:"Fill blanks (List-I) with phrasal verbs (List-II):\n(A) The teacher asked students to _____ the assignment\n(B) She decided to _____ the old dress for the younger sister\n(C) They had to _____ the picnic due to rain\n(D) He _____ his father's passion for photography\n(I) call off  (II) take after  (III) hand in  (IV) pass down",opts:["(A)-(III),(B)-(IV),(C)-(I),(D)-(II)","(A)-(I),(B)-(III),(C)-(IV),(D)-(II)","(A)-(IV),(B)-(I),(C)-(II),(D)-(III)","(A)-(II),(B)-(III),(C)-(I),(D)-(IV)"],correct:0,exp:"Hand in = submit (A-III); Pass down = pass to a younger generation (B-IV); Call off = cancel (C-I); Take after = resemble (D-II). So A-III, B-IV, C-I, D-II."}
+    ]
+  },
+  // MOCK 3
+  {
+    id:3,
+    title:"Mock Test 3",
+    questions:[
+      // RC1: Factual (Q1-Q4) — Urbanisation
+      {id:1,section:"rc",passage:"m3p1",text:"According to the passage, what is the primary consequence of rapid urban growth outpacing infrastructure development?",opts:["Increased investment in technology","Proliferation of informal settlements without basic amenities","Reduction in carbon emissions","Improvement in public transport systems"],correct:1,exp:"The passage states: 'Cities in developing nations struggle to provide adequate housing, clean water, sanitation, and public transport... The result is the proliferation of informal settlements, commonly called slums.'"},
+      {id:2,section:"rc",passage:"m3p1",text:"What does the passage mean by 'heat islands'?",opts:["Islands near the equator","Areas where renewable energy is produced","Urban zones where concrete traps heat, raising temperatures","Mountain regions with volcanic activity"],correct:2,exp:"The passage defines heat islands as 'zones where concrete and asphalt trap solar energy — raise temperatures in cities significantly above surrounding rural areas.'"},
+      {id:3,section:"rc",passage:"m3p1",text:"The author's attitude towards urbanisation can best be described as:-",opts:["entirely negative — urbanisation only causes problems","entirely positive — urbanisation brings only benefits","nuanced — acknowledging both challenges and opportunities","indifferent — urbanisation has no significant impact"],correct:2,exp:"The passage presents both challenges ('rapid urban growth often outpaces infrastructure') and opportunities ('well-managed urbanisation can be a powerful driver of human development'), showing a balanced, nuanced view."},
+      {id:4,section:"rc",passage:"m3p1",text:"The word 'proliferation' in the passage most closely means:-",opts:["decrease","rapid spread and increase","careful management","steady decline"],correct:1,exp:"Proliferation means rapid increase in numbers or spread. The passage uses it to describe the rapid increase of informal settlements in developing-nation cities facing rapid urbanisation."},
+      // RC2: Narrative (Q5-Q8) — Kites
+      {id:5,section:"rc",passage:"m3p2",text:"The grandfather's statement 'A kite is like a conversation' suggests that:-",opts:["kite-flying requires physical strength","effective communication requires both speaking and listening","kites are used for sending messages","competitions are more important than the joy of flying"],correct:1,exp:"The grandfather's analogy implies that flying a kite requires both action (pulling) and restraint (releasing/listening), just as conversation requires speaking and listening. The grandfather says 'You must listen as much as you speak.'"},
+      {id:6,section:"rc",passage:"m3p2",text:"At nine, Arjun broke many kites because:-",opts:["he was using inferior quality string","he was impatient and pulled when he should have yielded","his grandfather did not teach him properly","the winds were too strong that year"],correct:1,exp:"The passage explicitly states: 'He had broken countless kites through sheer stubbornness, tugging when he should have yielded.' His impatience and unwillingness to yield caused the kites to break."},
+      {id:7,section:"rc",passage:"m3p2",text:"The phrase 'the inheritance of patience from hand to hand across time' refers to:-",opts:["property being passed down in the family","the physical kite being shared between family members","the wisdom of patience being transmitted across generations","the string of a kite passing between competitors"],correct:2,exp:"The phrase describes how Arjun received patience from his grandfather through lived experience, and now passes it to his daughter through teaching. 'Hand to hand across time' is a metaphor for generational transmission of wisdom."},
+      {id:8,section:"rc",passage:"m3p2",text:"'Let it breathe' is Arjun's instruction to his daughter. In context, this most likely means:-",opts:["open the window to allow fresh air in","give the kite space and freedom to soar by not over-controlling it","ensure the string doesn't tangle","fly the kite near water"],correct:1,exp:"'Let it breathe' means give the kite freedom by not pulling too tightly — echoing the grandfather's lesson about yielding. In the broader context of the story, it means don't over-control; allow natural freedom."},
+      // RC3: Literary (Q9-Q12) — Cartographer
+      {id:9,section:"rc",passage:"m3p3",text:"The colleagues called Vikram 'meticulous' while his wife called him 'absent.' This contrast reveals:-",opts:["Vikram was careless about his professional work","Vikram's professional dedication came at a personal cost","Vikram had no passion for cartography","His wife admired his dedication to mapping"],correct:1,exp:"'Meticulous' (professional precision) vs 'absent' (emotionally or mentally distant at home) shows the contrast between his professional and personal life. His dedication to work made him appear absent to those closest to him."},
+      {id:10,section:"rc",passage:"m3p3",text:"What does Vikram mean when he says he drew 'not just land but time'?",opts:["He drew maps that included timelines","His maps captured the historical and human dimensions of landscapes","He was a very slow cartographer","He drew maps of different time periods"],correct:1,exp:"'Not just land but time' means his maps captured history, memory, and change — 'rivers that carried the memory of floods in their bends, villages where the soil held the colour of old settlements.' He mapped the invisible historical layer beneath the physical surface."},
+      {id:11,section:"rc",passage:"m3p3",text:"Identify the figure of speech in the phrase: 'pressing his ear to the earth as if listening for something that cartography had no symbol for'.",opts:["Simile","Metaphor","Personification","Hyperbole"],correct:0,exp:"This is a simile — it uses 'as if' to compare Vikram's action to that of someone listening for something unmappable. A simile uses 'like' or 'as/as if' to make comparisons."},
+      {id:12,section:"rc",passage:"m3p3",text:"Vikram's realisation that 'mapping was an act of reverence' suggests:-",opts:["Maps should only be drawn by religious people","Every map is a tribute to the mystery that lies beyond what can be charted","Maps are more important than the places they represent","Scientific accuracy is not important in cartography"],correct:1,exp:"The passage ends: 'beneath every mark lay a mystery deeper than any survey could reach.' Reverence here means acknowledgement that what is mapped is only a fraction of what truly exists. The map is a humble tribute, not a complete representation."},
+      // Rest of Mock 3 questions
+      {id:13,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) of ancient civilisations and their remarkable achievements\n(B) across vast desert landscapes, the pyramids of Egypt\n(C) rising majestically from the sands\n(D) stand as enduring testaments to the ingenuity",opts:["(B),(C),(D),(A)","(A),(D),(B),(C)","(C),(B),(A),(D)","(D),(A),(C),(B)"],correct:0,exp:"The correct order is B→C→D→A: 'Across vast desert landscapes, the pyramids of Egypt rising majestically from the sands stand as enduring testaments to the ingenuity of ancient civilisations and their remarkable achievements.'"},
+      {id:14,section:"vocab",passage:null,text:"Select the correct synonym for the word: Vociferous.",opts:["Quiet","Noisy and forceful","Thoughtful","Gentle"],correct:1,exp:"Vociferous means expressing opinions or feelings in a very loud or forceful way. 'Noisy and forceful' is the closest synonym. From Latin 'vociferari' meaning to shout."},
+      {id:15,section:"vocab",passage:null,text:"Choose the most appropriate antonym for the word: Acrimony.",opts:["Bitterness","Hostility","Goodwill","Resentment"],correct:2,exp:"Acrimony means bitterness or ill-feeling. Its antonym is 'goodwill' — friendly, helpful feelings or attitudes. Bitterness, hostility, and resentment are all synonyms of acrimony."},
+      {id:16,section:"vocab",passage:null,text:"Select the correct synonym for the word: Perfidious.",opts:["Loyal","Treacherous","Honest","Reliable"],correct:1,exp:"Perfidious means guilty of betrayal or deception; treacherous. 'Treacherous' is the direct synonym. From Latin 'perfidiosus' meaning faithless."},
+      {id:17,section:"grammar",passage:null,text:"Choose the correct preposition: The detective was searching ______ clues at the crime scene.",opts:["about","for","at","in"],correct:1,exp:"'Search for' is the correct phrasal verb when looking for something specific. 'Search for clues' means actively looking to find clues. 'Search at' would indicate location, not purpose."},
+      {id:18,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) the arts and sciences to solve complex global problems\n(B) interdisciplinary research that bridges\n(C) universities are increasingly promoting\n(D) ranging from climate change to public health crises",opts:["(C),(B),(A),(D)","(A),(D),(B),(C)","(B),(A),(C),(D)","(D),(C),(A),(B)"],correct:0,exp:"The correct order is C→B→A→D: 'Universities are increasingly promoting interdisciplinary research that bridges the arts and sciences to solve complex global problems ranging from climate change to public health crises.'"},
+      {id:19,section:"vocab",passage:null,text:"Match List-I (Words) with List-II (Definitions):\n(A) Impeccable  (B) Lachrymose  (C) Garrulous  (D) Taciturn\n(I) Tending to cry  (II) Excessively talkative  (III) Quiet, saying little  (IV) Perfect, without flaws",opts:["(A)-(IV),(B)-(I),(C)-(II),(D)-(III)","(A)-(I),(B)-(III),(C)-(IV),(D)-(II)","(A)-(II),(B)-(IV),(C)-(I),(D)-(III)","(A)-(III),(B)-(II),(C)-(I),(D)-(IV)"],correct:0,exp:"Impeccable = perfect, flawless (IV); Lachrymose = tending to cry (I); Garrulous = excessively talkative (II); Taciturn = quiet and reserved (III). So A-IV, B-I, C-II, D-III."},
+      {id:20,section:"grammar",passage:null,text:"Choose the correct option to fill in the blank: They ______ for two hours when the fire alarm went off.",opts:["were studying","had been studying","studied","are studying"],correct:1,exp:"This sentence describes an action that was in progress over a period of time before another past event (fire alarm). The past perfect continuous ('had been studying') correctly expresses this ongoing past action interrupted by another past event."},
+      {id:21,section:"vocab",passage:null,text:"Choose the best one-word substitute: The science that deals with heredity and the variation of inherited characteristics.",opts:["Ecology","Genetics","Botany","Zoology"],correct:1,exp:"Genetics is the branch of biology concerned with the study of genes, genetic variation, and heredity in organisms. From Greek 'genesis' meaning origin, creation."},
+      {id:22,section:"vocab",passage:null,text:"Choose the most appropriate antonym for the word: Garrulous.",opts:["Talkative","Verbose","Taciturn","Loquacious"],correct:2,exp:"Garrulous means excessively talkative, especially on trivial matters. Its antonym is 'taciturn' — reserved, saying little. Talkative, verbose, and loquacious are synonyms."},
+      {id:23,section:"idioms",passage:null,text:"Identify the correct meaning of the idiom: 'Let the cat out of the bag'",opts:["To release an animal","To reveal a secret accidentally","To show courage","To cause confusion"],correct:1,exp:"'Let the cat out of the bag' means to reveal a secret unintentionally. The origin possibly relates to market frauds where a pig in a sack was substituted with a cat, and the trick was revealed when the cat escaped."},
+      {id:24,section:"grammar",passage:null,text:"Choose the correct option: Despite ______ very hard, he could not pass the examination.",opts:["studying","having studied","to study","study"],correct:0,exp:"After a preposition (despite), a gerund (verb + -ing) is used. 'Despite studying' is correct. 'Despite having studied' is also possible but less common; 'studying' is the simplest and most natural form here."},
+      {id:25,section:"vocab",passage:null,text:"Select the correct synonym for the word: Enervate.",opts:["Energise","Weaken","Strengthen","Stimulate"],correct:1,exp:"Enervate means to cause someone to feel drained of energy or vitality. 'Weaken' is the closest synonym. Energise and stimulate are antonyms. From Latin 'enervare' meaning to weaken by removing sinews."},
+      {id:26,section:"vocab",passage:null,text:"Choose the best option that explains the given statement in one word: A doctor who specialises in the treatment of skin diseases.",opts:["Cardiologist","Dermatologist","Neurologist","Ophthalmologist"],correct:1,exp:"A Dermatologist specialises in skin diseases and conditions. From Greek 'derma' (skin) + 'logos' (study). Cardiologist (heart), Neurologist (nervous system), Ophthalmologist (eyes)."},
+      {id:27,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) enabling them to develop critical reasoning skills\n(B) exposure to diverse literary genres\n(C) and a broad appreciation of human experience\n(D) challenges students to think beyond their own perspectives,",opts:["(B),(D),(A),(C)","(A),(B),(D),(C)","(C),(D),(B),(A)","(D),(B),(C),(A)"],correct:0,exp:"The correct order is B→D→A→C: 'Exposure to diverse literary genres challenges students to think beyond their own perspectives, enabling them to develop critical reasoning skills and a broad appreciation of human experience.'"},
+      {id:28,section:"idioms",passage:null,text:"Choose the correct idiom: The athlete recovered quickly from injury because she ______ and returned to training.",opts:["pulled up her socks","bit the bullet","broke the ice","threw in the towel"],correct:1,exp:"'Bit the bullet' means to endure a difficult or painful situation courageously. The athlete faced the pain of recovery and pushed through it courageously, making this the most appropriate idiom."},
+      {id:29,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) through storytelling, dance, and ritual practices\n(B) indigenous communities around the world have preserved\n(C) connecting current generations to their ancestral roots\n(D) their rich cultural heritage for centuries",opts:["(B),(D),(A),(C)","(A),(C),(B),(D)","(D),(A),(B),(C)","(B),(A),(D),(C)"],correct:0,exp:"The correct order is B→D→A→C: 'Indigenous communities around the world have preserved their rich cultural heritage for centuries through storytelling, dance, and ritual practices connecting current generations to their ancestral roots.'"},
+      {id:30,section:"grammar",passage:null,text:"Select the most appropriate option: The jury ______ its verdict after three days of deliberation.",opts:["have delivered","delivered","were delivering","deliver"],correct:1,exp:"'Jury' as a collective noun in British English takes a singular verb. 'Delivered' (simple past) is the appropriate tense for a completed action. 'Have delivered' would work in present perfect, but 'delivered' matches the narrative past tense context."},
+      {id:31,section:"grammar",passage:null,text:"Choose the correct option to fill in the blank: She ______ write poetry when she was young.",opts:["used to","is used to","was used to","has been used to"],correct:0,exp:"'Used to + infinitive' describes a past habit or state that no longer exists. 'She used to write poetry' correctly expresses that she had the habit of writing poetry in the past but no longer does."},
+      {id:32,section:"vocab",passage:null,text:"Choose the correct antonym of the word: Inimical.",opts:["Hostile","Adverse","Friendly","Harmful"],correct:2,exp:"Inimical means tending to obstruct or harm; hostile. Its antonym is 'friendly' — kind, pleasant, and cooperative. Hostile, adverse, and harmful are all synonyms of inimical."},
+      {id:33,section:"idioms",passage:null,text:"Match idioms (List-I) with meanings (List-II):\n(A) Kick the bucket  (B) The whole nine yards  (C) Hit the sack  (D) Under the weather\n(I) Go to bed  (II) Everything  (III) Feeling ill  (IV) Die",opts:["(A)-(IV),(B)-(II),(C)-(I),(D)-(III)","(A)-(I),(B)-(III),(C)-(IV),(D)-(II)","(A)-(II),(B)-(IV),(C)-(III),(D)-(I)","(A)-(III),(B)-(I),(C)-(II),(D)-(IV)"],correct:0,exp:"Kick the bucket = die (IV); The whole nine yards = everything, the full amount (II); Hit the sack = go to bed (I); Under the weather = feeling ill (III). So A-IV, B-II, C-I, D-III."},
+      {id:34,section:"vocab",passage:null,text:"Select the correct synonym for the word: Ebullience.",opts:["Gloom","Exuberance","Restraint","Indifference"],correct:1,exp:"Ebullience means the quality of being cheerful and full of energy. 'Exuberance' is the closest synonym, meaning lively energy and enthusiasm. Gloom and restraint are antonyms."},
+      {id:35,section:"vocab",passage:null,text:"Choose the correct antonym of the underlined word: The parsimonious landlord refused to repair the broken heater.",opts:["generous","miserly","stingy","frugal"],correct:0,exp:"Parsimonious means very unwilling to spend money; miserly. Its antonym is 'generous' — showing a readiness to give more of something than is strictly necessary. Miserly, stingy, and frugal are synonyms."},
+      {id:36,section:"vocab",passage:null,text:"Fill blanks (List-I) with suitable words (List-II):\n(A) The _____ of the crowd made the speaker nervous\n(B) The _____ atmosphere of the library helped her focus\n(C) His _____ acceptance of defeat surprised everyone\n(D) The _____ of the mountain landscape left them speechless\n(I) serene  (II) tumult  (III) grandeur  (IV) stoic",opts:["(A)-(II),(B)-(I),(C)-(IV),(D)-(III)","(A)-(I),(B)-(IV),(C)-(III),(D)-(II)","(A)-(III),(B)-(II),(C)-(I),(D)-(IV)","(A)-(IV),(B)-(III),(C)-(II),(D)-(I)"],correct:0,exp:"Tumult = noisy confusion of crowd (A-II); Serene = calm atmosphere (B-I); Stoic = showing no emotion (C-IV); Grandeur = impressive beauty (D-III). So A-II, B-I, C-IV, D-III."},
+      {id:37,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) enhancing the quality of life for urban residents\n(B) by reducing pollution, managing traffic,\n(C) smart city technologies are transforming urban living\n(D) and improving access to essential public services,",opts:["(C),(B),(D),(A)","(A),(B),(C),(D)","(B),(D),(C),(A)","(D),(A),(B),(C)"],correct:0,exp:"The correct order is C→B→D→A: 'Smart city technologies are transforming urban living by reducing pollution, managing traffic, and improving access to essential public services, enhancing the quality of life for urban residents.'"},
+      {id:38,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) through music, dance, and visual arts\n(B) creative expression plays a fundamental role\n(C) allowing individuals to process emotions\n(D) in human wellbeing and psychological health,",opts:["(B),(D),(C),(A)","(A),(C),(D),(B)","(D),(A),(C),(B)","(C),(B),(A),(D)"],correct:0,exp:"The correct order is B→D→C→A: 'Creative expression plays a fundamental role in human wellbeing and psychological health, allowing individuals to process emotions through music, dance, and visual arts.'"},
+      {id:39,section:"vocab",passage:null,text:"Choose the correct antonym for the word: Intrepid.",opts:["Brave","Fearless","Timid","Bold"],correct:2,exp:"Intrepid means fearless and adventurous. Its antonym is 'timid' — showing a lack of courage or confidence. Brave, fearless, and bold are synonyms of intrepid."},
+      {id:40,section:"idioms",passage:null,text:"Identify the correct meaning of the idiom: 'Burn bridges'",opts:["To start a fire on a bridge","To permanently damage a relationship","To cross a bridge on fire","To build new connections"],correct:1,exp:"'Burn bridges' (or burn one's bridges) means to take irreversible action that damages a relationship or forecloses future options, especially by behaving badly towards someone you might need later."},
+      {id:41,section:"vocab",passage:null,text:"Select the correct synonym for the word: Equanimity.",opts:["Anxiety","Composure","Agitation","Turmoil"],correct:1,exp:"Equanimity means mental calmness especially in difficult situations. 'Composure' is the closest synonym — the state of being calm and in control of one's emotions. Anxiety, agitation, and turmoil are antonyms."},
+      {id:42,section:"literary",passage:null,text:"Identify the figure of speech: 'The camel is the ship of the desert.'",opts:["Simile","Personification","Metaphor","Oxymoron"],correct:2,exp:"This is a metaphor — it directly states the camel IS a ship (not like a ship). A metaphor makes a direct comparison by saying something IS something else, without using 'like' or 'as'."},
+      {id:43,section:"vocab",passage:null,text:"Match phrasal verbs (List-I) with meanings (List-II):\n(A) Run out of  (B) Come across  (C) Make up for  (D) Put off\n(I) Postpone  (II) Encounter by chance  (III) Exhaust supply  (IV) Compensate",opts:["(A)-(III),(B)-(II),(C)-(IV),(D)-(I)","(A)-(I),(B)-(IV),(C)-(II),(D)-(III)","(A)-(II),(B)-(III),(C)-(I),(D)-(IV)","(A)-(IV),(B)-(I),(C)-(III),(D)-(II)"],correct:0,exp:"Run out of = exhaust supply (III); Come across = encounter by chance (II); Make up for = compensate (IV); Put off = postpone (I). So A-III, B-II, C-IV, D-I."},
+      {id:44,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) in the face of rising global temperatures\n(B) and unpredictable weather patterns worldwide\n(C) adaptation strategies have become increasingly critical\n(D) for communities and governments to implement effective",opts:["(C),(D),(A),(B)","(A),(B),(D),(C)","(B),(D),(A),(C)","(D),(A),(C),(B)"],correct:0,exp:"The correct order is C→D→A→B: 'Adaptation strategies have become increasingly critical for communities and governments to implement effective in the face of rising global temperatures and unpredictable weather patterns worldwide.'"},
+      {id:45,section:"vocab",passage:null,text:"Choose the most appropriate synonym of the underlined word: The judge made an impartial ruling that satisfied both parties.",opts:["biased","partial","fair","strict"],correct:2,exp:"Impartial means treating all rivals or disputants equally; not supporting any side. 'Fair' is the closest synonym. Biased and partial are antonyms of impartial."},
+      {id:46,section:"idioms",passage:null,text:"Identify the correct meaning of the idiom: 'Bite the hand that feeds you'",opts:["To be grateful for help received","To harm someone who has helped you","To accept help ungraciously","To feed animals by hand"],correct:1,exp:"'Bite the hand that feeds you' means to act against or harm someone who has helped or supported you. The metaphor of biting the hand that provides food captures the ingratitude and self-harm of such behaviour."},
+      {id:47,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) using traditional techniques passed down through generations\n(B) the master craftsman spent decades perfecting his art\n(C) creating pieces of extraordinary beauty and precision\n(D) of hand-weaving fine silk textiles,",opts:["(B),(D),(A),(C)","(A),(C),(D),(B)","(C),(D),(B),(A)","(D),(B),(A),(C)"],correct:0,exp:"The correct order is B→D→A→C: 'The master craftsman spent decades perfecting his art of hand-weaving fine silk textiles, using traditional techniques passed down through generations creating pieces of extraordinary beauty and precision.'"},
+      {id:48,section:"grammar",passage:null,text:"Choose the correct option to fill in the blank: She looked as ______ she had seen a ghost.",opts:["if","though","like","that"],correct:0,exp:"'As if' is used to describe something that appears a certain way or to express a comparison with an imaginary situation. 'She looked as if she had seen a ghost' is the standard idiomatic expression."},
+      {id:49,section:"grammar",passage:null,text:"Choose the correct option: The more you practise, ______ you become.",opts:["the better","better","best","the best"],correct:0,exp:"'The more...the + comparative' is the correct structure for expressing proportional relationships. 'The more you practise, the better you become' is the standard correlative comparative construction."},
+      {id:50,section:"vocab",passage:null,text:"Fill blanks (List-I) with suitable phrasal verbs (List-II):\n(A) The company had to _____ hundreds of employees last year\n(B) She managed to _____ the difficult negotiations successfully\n(C) He decided to _____ medicine as his career\n(D) The team worked hard to _____ its earlier mistakes\n(I) take up  (II) lay off  (III) see through  (IV) make up for",opts:["(A)-(II),(B)-(III),(C)-(I),(D)-(IV)","(A)-(I),(B)-(IV),(C)-(II),(D)-(III)","(A)-(III),(B)-(I),(C)-(IV),(D)-(II)","(A)-(IV),(B)-(II),(C)-(III),(D)-(I)"],correct:0,exp:"Lay off = make redundant (A-II); See through = complete despite difficulties (B-III); Take up = begin (C-I); Make up for = compensate (D-IV). So A-II, B-III, C-I, D-IV."}
+    ]
+  },
+  // MOCK 4
+  {
+    id:4,
+    title:"Mock Test 4",
+    questions:[
+      // RC1: Factual (Q1-Q4) — AI in Education
+      {id:1,section:"rc",passage:"m4p1",text:"According to the passage, AI-powered adaptive learning platforms can:-",opts:["replace teachers entirely in the classroom","identify student strengths and gaps to personalise content","provide entertainment to students during breaks","reduce the cost of school buildings"],correct:1,exp:"The passage states: 'Adaptive learning platforms analyse student performance in real time, identifying strengths and gaps to tailor content accordingly.'"},
+      {id:2,section:"rc",passage:"m4p1",text:"Which of the following best represents the author's view on teachers in an AI-integrated classroom?",opts:["Teachers will become redundant as AI takes over all functions","Teachers will focus more on mentoring, creativity, and emotional support","Teachers will primarily manage AI systems and technical equipment","Teachers will only be needed to handle administrative paperwork"],correct:1,exp:"The passage states that with AI handling administrative tasks, teachers can 'focus on mentoring, creative instruction, and emotional support — areas where human judgment remains irreplaceable.'"},
+      {id:3,section:"rc",passage:"m4p1",text:"What concern does the author raise about AI and educational equity?",opts:["AI tools are too expensive for all schools to afford","Students without internet access or devices may be excluded from AI-enhanced learning","Teachers are not trained to use AI tools effectively","AI creates too much data that is difficult to manage"],correct:1,exp:"The passage explicitly states: 'Students without reliable internet access or devices are excluded from AI-enhanced learning environments, potentially widening the gap between privileged and underprivileged learners.'"},
+      {id:4,section:"rc",passage:"m4p1",text:"The phrase 'Technology must serve pedagogy, not supplant it' means:-",opts:["Pedagogy should be replaced by technology","Technology should be the primary focus in education","AI should support teaching and learning, not replace it","Technology and teaching should remain completely separate"],correct:2,exp:"'Supplant' means to replace. The author argues technology should serve (support) teaching, not replace it. This reflects the view that AI is a tool to enhance teaching, not substitute for it."},
+      // RC2: Narrative (Q5-Q8) — Garden in Desert
+      {id:5,section:"rc",passage:"m4p2",text:"What distinguishes Meera's approach from conventional agricultural attempts in the region?",opts:["She used imported expensive seeds","She employed modern chemical fertilisers","She revived traditional water harvesting techniques adapted to arid conditions","She hired professional agricultural experts"],correct:2,exp:"The passage states Meera 'studied traditional water harvesting techniques — johads, khadins, and talabs' and planted 'seeds adapted to arid conditions.' Her approach drew on indigenous knowledge rather than modern methods."},
+      {id:6,section:"rc",passage:"m4p2",text:"The phrase 'the first green shoot of faith' suggests:-",opts:["Meera planted green-coloured seeds","After three years, the first visible sign of success appeared","Faith is a kind of plant that grows in gardens","The soil finally accepted chemical fertilisers"],correct:1,exp:"'The first green shoot of faith' is a metaphor. After three years, the first plant grew — signalling that Meera's belief and effort were being rewarded. The 'faith' refers to her conviction that the land could be restored."},
+      {id:7,section:"rc",passage:"m4p2",text:"The return of birds to the garden is significant because:-",opts:["Meera had been keeping birds as pets","It signals ecological restoration and the return of a balanced ecosystem","Meera needed the birds to pollinate her crops","The neighbours had asked Meera to attract birds"],correct:1,exp:"'The birds returned first, then the insects, then the neighbours.' The return of birds marks natural ecological restoration — when the ecosystem begins to recover, wildlife returns first, indicating environmental health."},
+      {id:8,section:"rc",passage:"m4p2",text:"What is the deeper significance of Meera's neighbours arriving with questions?",opts:["They wanted to copy her garden design for commercial profit","It shows that scepticism can be overcome by practical demonstration","They were concerned about the impact on property values","They needed her permission to use the traditional techniques"],correct:1,exp:"The neighbours who had 'shaken their heads' with certainty that Meera would fail now came 'quietly at first, then with questions.' Practical success overcame their initial scepticism — demonstration proved more persuasive than argument."},
+      // RC3: Literary (Q9-Q12) — Letters Never Sent
+      {id:9,section:"rc",passage:"m4p3",text:"Why does Amrita write letters that she never sends?",opts:["She has no postal address for Zara","She writes as an act of connection and hope, waiting for the border situation to improve","She is too busy with her new life to mail the letters","She believes Zara would not be interested in reading them"],correct:1,exp:"The passage states she wrote 'as though the border were merely an inconvenience' and 'told herself she was waiting for the right moment.' The letters are an act of sustained hope and emotional connection despite physical separation."},
+      {id:10,section:"rc",passage:"m4p3",text:"The title chosen by the granddaughter — 'What the Jasmine Remembered' — suggests:-",opts:["Jasmine flowers have a particularly good memory","The letters were written near a jasmine plant","Ordinary domestic details like jasmine carry the memory of interrupted lives and losses","The partition affected the jasmine flower trade significantly"],correct:2,exp:"Amrita wrote of 'the jasmine climbing the boundary wall.' The title uses jasmine as a symbol of ordinary domestic life disrupted by the partition. The jasmine 'remembers' the lives lived in its presence."},
+      {id:11,section:"rc",passage:"m4p3",text:"The phrase 'addressed to all the futures that had been interrupted' suggests that the letters:-",opts:["contain predictions about the future","represent all lives disrupted by partition, not just Amrita's alone","are addressed to multiple cousins simultaneously","describe future plans for the two countries"],correct:1,exp:"The letters are literally addressed to Zara, but metaphorically they speak to 'all the futures interrupted' by partition. The granddaughter recognises that the letters represent a collective human experience, not just one woman's personal loss."},
+      {id:12,section:"rc",passage:"m4p3",text:"Identify the figure of speech in the phrase: 'how people carry what they cannot put down'.",opts:["Simile","Metaphor","Hyperbole","Alliteration"],correct:1,exp:"This is a metaphor — it compares the burden of loss and memory to a physical object that one 'carries' and 'cannot put down.' It uses the physical language of carrying to describe the emotional experience of bearing unresolvable grief."},
+      {id:13,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) that could otherwise lead to armed conflicts\n(B) and preventing escalation of disputes\n(C) diplomatic negotiations play a crucial role\n(D) in resolving international tensions peacefully",opts:["(C),(D),(B),(A)","(A),(B),(C),(D)","(B),(A),(D),(C)","(D),(C),(A),(B)"],correct:0,exp:"The correct order is C→D→B→A: 'Diplomatic negotiations play a crucial role in resolving international tensions peacefully and preventing escalation of disputes that could otherwise lead to armed conflicts.'"},
+      {id:14,section:"vocab",passage:null,text:"Select the correct synonym for the word: Ostentatious.",opts:["Modest","Showy","Restrained","Simple"],correct:1,exp:"Ostentatious means characterised by vulgar or pretentious display; designed to impress. 'Showy' is the closest synonym. Modest, restrained, and simple are antonyms."},
+      {id:15,section:"vocab",passage:null,text:"Choose the most appropriate antonym for the word: Candour.",opts:["Frankness","Honesty","Deception","Openness"],correct:2,exp:"Candour means the quality of being open and honest. Its antonym is 'deception' — the act of causing someone to believe something false. Frankness, honesty, and openness are synonyms."},
+      {id:16,section:"vocab",passage:null,text:"Select the correct synonym for the word: Fastidious.",opts:["Careless","Meticulous","Negligent","Hasty"],correct:1,exp:"Fastidious means very attentive to and concerned about accuracy and detail. 'Meticulous' is the closest synonym — showing great attention to detail. Careless and negligent are antonyms."},
+      {id:17,section:"grammar",passage:null,text:"Choose the correct option: He insisted that she ______ the report immediately.",opts:["submits","submitted","submit","will submit"],correct:2,exp:"After verbs like 'insist', 'demand', 'request', 'suggest' in formal English, the subjunctive mood is used. The subjunctive uses the base form of the verb (submit) regardless of subject."},
+      {id:18,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) achieving gender parity in political representation\n(B) requires sustained policy intervention and cultural change\n(C) across all levels of government\n(D) as women remain underrepresented",opts:["(A),(C),(D),(B)","(B),(D),(A),(C)","(D),(C),(A),(B)","(A),(D),(C),(B)"],correct:0,exp:"The correct order is A→C→D→B: 'Achieving gender parity in political representation across all levels of government as women remain underrepresented requires sustained policy intervention and cultural change.'"},
+      {id:19,section:"vocab",passage:null,text:"Match List-I (Words) with List-II (Definitions):\n(A) Sycophant  (B) Recluse  (C) Maverick  (D) Demagogue\n(I) A person who lives alone and avoids others\n(II) A political leader who appeals to emotion rather than reason\n(III) A flatterer who uses excessive praise to gain favour\n(IV) An independent thinker who doesn't follow the group",opts:["(A)-(III),(B)-(I),(C)-(IV),(D)-(II)","(A)-(I),(B)-(II),(C)-(III),(D)-(IV)","(A)-(IV),(B)-(III),(C)-(I),(D)-(II)","(A)-(II),(B)-(IV),(C)-(I),(D)-(III)"],correct:0,exp:"Sycophant = excessive flatterer (III); Recluse = person living alone (I); Maverick = independent thinker (IV); Demagogue = political leader using emotion (II). So A-III, B-I, C-IV, D-II."},
+      {id:20,section:"grammar",passage:null,text:"Choose the correct option: Scarcely had she stepped outside ______ it began to rain.",opts:["than","then","when","before"],correct:2,exp:"'Scarcely...when' is the correct correlative conjunction. 'Scarcely/Hardly/Barely + past perfect, when + simple past' is the standard structure. 'Than' is used with 'No sooner', not with 'scarcely'."},
+      {id:21,section:"vocab",passage:null,text:"Choose the best one-word substitute: A person who is new to a subject or activity.",opts:["Expert","Virtuoso","Novice","Veteran"],correct:2,exp:"A novice is a person who is new to or inexperienced in a field of activity. From Latin 'novicius' meaning newly arrived. Expert and virtuoso indicate high skill; veteran indicates long experience."},
+      {id:22,section:"vocab",passage:null,text:"Choose the most appropriate antonym for the word: Conspicuous.",opts:["Noticeable","Prominent","Inconspicuous","Obvious"],correct:2,exp:"Conspicuous means clearly visible; attracting notice. Its antonym is 'inconspicuous' — not clearly visible or attracting attention. Noticeable, prominent, and obvious are synonyms."},
+      {id:23,section:"idioms",passage:null,text:"Identify the correct meaning of the idiom: 'Hit the nail on the head'",opts:["To cause physical damage","To describe something accurately","To be very punctual","To work extremely hard"],correct:1,exp:"'Hit the nail on the head' means to describe exactly what is causing a situation or problem; to say something exactly right. The metaphor derives from carpentry — hitting a nail precisely drives it in properly."},
+      {id:24,section:"grammar",passage:null,text:"Choose the correct option: It is essential that every student ______ the examination guidelines carefully.",opts:["reads","read","reading","to read"],correct:1,exp:"In formal English, after expressions like 'it is essential that', 'it is important that', the subjunctive is used. The subjunctive form uses the base verb (read) regardless of subject."},
+      {id:25,section:"vocab",passage:null,text:"Select the correct synonym for the word: Vituperate.",opts:["Praise","Blame vehemently","Admire","Encourage"],correct:1,exp:"Vituperate means to blame or abuse in strong language. 'Blame vehemently' captures the aggressive, harsh nature of vituperation. Praise, admire, and encourage are antonyms."},
+      {id:26,section:"vocab",passage:null,text:"Choose the best option that explains the given statement in one word: Government by the people, for the people, of the people.",opts:["Monarchy","Oligarchy","Democracy","Theocracy"],correct:2,exp:"Democracy is the system of government in which power is vested in the people, who rule either directly or through freely elected representatives. The description 'by the people, for the people' is Abraham Lincoln's definition."},
+      {id:27,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) the unprecedented loss of biodiversity\n(B) poses a severe threat to ecosystem stability\n(C) caused by deforestation and habitat destruction\n(D) and the services that ecosystems provide to humanity",opts:["(A),(C),(B),(D)","(B),(D),(A),(C)","(C),(A),(D),(B)","(D),(B),(C),(A)"],correct:0,exp:"The correct order is A→C→B→D: 'The unprecedented loss of biodiversity caused by deforestation and habitat destruction poses a severe threat to ecosystem stability and the services that ecosystems provide to humanity.'"},
+      {id:28,section:"idioms",passage:null,text:"Choose the correct idiom: After the merger, the new CEO worked hard to ______ and unite the two company cultures.",opts:["rock the boat","break the ice","mend fences","spill the beans"],correct:2,exp:"'Mend fences' means to repair a damaged relationship or resolve a disagreement. After a merger that may have created conflict, the CEO working to unite cultures is 'mending fences' — repairing divisions."},
+      {id:29,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) and remain economically productive in their senior years\n(B) as life expectancy increases globally,\n(C) necessitating new policies on retirement age\n(D) people are remaining physically active and mentally sharp",opts:["(B),(D),(A),(C)","(A),(C),(D),(B)","(D),(B),(C),(A)","(C),(D),(B),(A)"],correct:0,exp:"The correct order is B→D→A→C: 'As life expectancy increases globally, people are remaining physically active and mentally sharp and remain economically productive in their senior years necessitating new policies on retirement age.'"},
+      {id:30,section:"grammar",passage:null,text:"Select the most appropriate option: ______ the rain had stopped, they decided to go for a walk.",opts:["Although","Since","Unless","However"],correct:1,exp:"'Since' means 'because' when used as a conjunction at the beginning of a clause. 'Since the rain had stopped' = 'because the rain had stopped.' 'Although' would imply contrast, which doesn't fit the context."},
+      {id:31,section:"grammar",passage:null,text:"Choose the correct option: The book ______ by the time he arrived at the library.",opts:["had been issued","has been issued","was issued","is issued"],correct:0,exp:"The action (book being issued) was completed before another past action (arriving at the library). This requires the past perfect passive: 'had been issued.' The past perfect places the book-issuing earlier than the arrival."},
+      {id:32,section:"vocab",passage:null,text:"Choose the correct antonym of the word: Sagacious.",opts:["Wise","Shrewd","Foolish","Discerning"],correct:2,exp:"Sagacious means having or showing keen mental discernment and good judgment. Its antonym is 'foolish' — lacking good sense or judgment. Wise, shrewd, and discerning are synonyms."},
+      {id:33,section:"idioms",passage:null,text:"Match idioms (List-I) with meanings (List-II):\n(A) Cost an arm and a leg  (B) Beat around the bush  (C) Up in the air  (D) Get out of hand\n(I) Become uncontrollable  (II) Very expensive  (III) Uncertain  (IV) Avoid the main point",opts:["(A)-(II),(B)-(IV),(C)-(III),(D)-(I)","(A)-(I),(B)-(III),(C)-(II),(D)-(IV)","(A)-(III),(B)-(I),(C)-(IV),(D)-(II)","(A)-(IV),(B)-(II),(C)-(I),(D)-(III)"],correct:0,exp:"Cost an arm and a leg = very expensive (II); Beat around the bush = avoid the main point (IV); Up in the air = uncertain (III); Get out of hand = become uncontrollable (I)."},
+      {id:34,section:"vocab",passage:null,text:"Select the correct synonym for the word: Loquacious.",opts:["Quiet","Taciturn","Talkative","Reserved"],correct:2,exp:"Loquacious means tending to talk a great deal; garrulous. 'Talkative' is the most common synonym. Quiet, taciturn, and reserved are antonyms."},
+      {id:35,section:"vocab",passage:null,text:"Choose the correct antonym of the underlined word: The benevolent ruler donated generously to the poor.",opts:["charitable","kind","malevolent","compassionate"],correct:2,exp:"Benevolent means well-meaning and kindly. Its antonym is 'malevolent' — having or showing a wish to do evil to others. Charitable, kind, and compassionate are synonyms."},
+      {id:36,section:"vocab",passage:null,text:"Fill blanks (List-I) with suitable words (List-II):\n(A) The _____ scientist published her groundbreaking research\n(B) His _____ behaviour at the funeral shocked everyone\n(C) The _____ child refused to eat vegetables\n(D) Her _____ response to criticism helped her grow professionally\n(I) resilient  (II) eminent  (III) obstinate  (IV) flippant",opts:["(A)-(II),(B)-(IV),(C)-(III),(D)-(I)","(A)-(I),(B)-(III),(C)-(II),(D)-(IV)","(A)-(IV),(B)-(II),(C)-(I),(D)-(III)","(A)-(III),(B)-(I),(C)-(IV),(D)-(II)"],correct:0,exp:"Eminent = distinguished/prominent (A-II); Flippant = not showing proper seriousness (B-IV); Obstinate = stubbornly refusing (C-III); Resilient = recovering quickly (D-I). So A-II, B-IV, C-III, D-I."},
+      {id:37,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) monitoring vital signs and predicting health risks\n(B) wearable health technology has revolutionised personal healthcare\n(C) before they become serious medical conditions\n(D) by providing real-time data on physical activity,",opts:["(B),(D),(A),(C)","(A),(B),(C),(D)","(C),(A),(D),(B)","(D),(B),(A),(C)"],correct:0,exp:"The correct order is B→D→A→C: 'Wearable health technology has revolutionised personal healthcare by providing real-time data on physical activity, monitoring vital signs and predicting health risks before they become serious medical conditions.'"},
+      {id:38,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) and cultural identities in an increasingly globalised world\n(B) the preservation of indigenous languages is essential\n(C) before they are lost to the forces of assimilation\n(D) for maintaining unique ways of knowing",opts:["(B),(D),(A),(C)","(C),(D),(B),(A)","(A),(B),(D),(C)","(D),(B),(C),(A)"],correct:0,exp:"The correct order is B→D→A→C: 'The preservation of indigenous languages is essential for maintaining unique ways of knowing and cultural identities in an increasingly globalised world before they are lost to the forces of assimilation.'"},
+      {id:39,section:"vocab",passage:null,text:"Choose the correct antonym for the word: Profligate.",opts:["Extravagant","Wasteful","Thrifty","Reckless"],correct:2,exp:"Profligate means spending money or using resources freely and recklessly. Its antonym is 'thrifty' — using money and resources carefully and not wastefully. Extravagant, wasteful, and reckless are synonyms."},
+      {id:40,section:"idioms",passage:null,text:"Identify the correct meaning of the idiom: 'Every cloud has a silver lining'",opts:["Clouds contain water droplets","Difficult situations have some positive aspects","Silver is found in the atmosphere","Weather patterns always improve"],correct:1,exp:"'Every cloud has a silver lining' means that every difficult or negative situation has some positive aspect or ultimately leads to something good. The silver lining refers to the bright edge of a cloud when the sun is behind it."},
+      {id:41,section:"vocab",passage:null,text:"Select the correct synonym for the word: Accolades.",opts:["Criticisms","Awards and praise","Punishments","Complaints"],correct:1,exp:"Accolades means awards or expressions of praise. 'Awards and praise' is the direct synonym. Criticisms and complaints are antonyms. From French 'accolade' originally meaning an embrace conferring knighthood."},
+      {id:42,section:"literary",passage:null,text:"Identify the figure of speech: 'Life is a journey with no map.'",opts:["Simile","Hyperbole","Metaphor","Personification"],correct:2,exp:"This is a metaphor — it directly equates life to a journey without using 'like' or 'as'. The comparison implies that life, like a journey, involves direction, progress, and unknown destinations without predetermined guidance."},
+      {id:43,section:"vocab",passage:null,text:"Match phrasal verbs (List-I) with meanings (List-II):\n(A) Brush up  (B) Fall out  (C) Hold on  (D) Back down\n(I) Quarrel and stop being friends  (II) Wait  (III) Revise and improve  (IV) Withdraw from a position",opts:["(A)-(III),(B)-(I),(C)-(II),(D)-(IV)","(A)-(I),(B)-(III),(C)-(IV),(D)-(II)","(A)-(II),(B)-(IV),(C)-(I),(D)-(III)","(A)-(IV),(B)-(II),(C)-(III),(D)-(I)"],correct:0,exp:"Brush up = revise and improve skills (III); Fall out = quarrel and stop being friends (I); Hold on = wait (II); Back down = withdraw from a position (IV). So A-III, B-I, C-II, D-IV."},
+      {id:44,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) economic inequality and inadequate social safety nets\n(B) urban poverty is a complex phenomenon\n(C) into a cycle of deprivation across generations\n(D) driven by multiple factors including lack of education,",opts:["(B),(D),(A),(C)","(A),(C),(D),(B)","(C),(B),(D),(A)","(D),(A),(B),(C)"],correct:0,exp:"The correct order is B→D→A→C: 'Urban poverty is a complex phenomenon driven by multiple factors including lack of education, economic inequality and inadequate social safety nets into a cycle of deprivation across generations.'"},
+      {id:45,section:"vocab",passage:null,text:"Choose the most appropriate synonym of the underlined word: The tenacious lawyer refused to give up on the case despite numerous setbacks.",opts:["timid","persistent","careless","distracted"],correct:1,exp:"Tenacious means tending to keep a firm hold of something; not readily relinquishing. 'Persistent' is the closest synonym — continuing firmly in spite of difficulty or opposition."},
+      {id:46,section:"idioms",passage:null,text:"Identify the correct meaning of the idiom: 'A stitch in time saves nine'",opts:["Sewing is an important skill","Acting promptly prevents greater problems later","Nine is an important number in sewing","Timing is everything in fashion"],correct:1,exp:"'A stitch in time saves nine' means that it is better to act promptly to fix a small problem now, rather than wait and let it grow into a larger, more costly problem. Addressing issues early prevents them from multiplying."},
+      {id:47,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) and economic opportunities for millions globally\n(B) the digital economy has created new avenues\n(C) while simultaneously raising concerns\n(D) for entrepreneurship, employment,",opts:["(B),(D),(A),(C)","(A),(C),(B),(D)","(D),(B),(A),(C)","(C),(D),(A),(B)"],correct:0,exp:"The correct order is B→D→A→C: 'The digital economy has created new avenues for entrepreneurship, employment, and economic opportunities for millions globally while simultaneously raising concerns.'"},
+      {id:48,section:"grammar",passage:null,text:"Choose the correct option to fill in the blank: The more we try to control everything, the ______ we feel.",opts:["more anxious","most anxious","anxious","anxiously"],correct:0,exp:"'The more...the more/comparative' is the correct structure. 'The more we try, the more anxious we feel' uses the correlative comparative construction correctly."},
+      {id:49,section:"grammar",passage:null,text:"Choose the correct option: He spoke ______ that nobody could understand him.",opts:["so fast","too fast","very fast","such fast"],correct:0,exp:"'So + adjective/adverb + that' is the standard structure to express a degree that leads to a consequence. 'He spoke so fast that nobody could understand him' is the correct construction."},
+      {id:50,section:"vocab",passage:null,text:"Fill blanks (List-I) with suitable phrasal verbs (List-II):\n(A) The students were asked to _____ their essays online\n(B) She couldn't _____ the loss of her beloved pet\n(C) The contract was designed to _____ both parties equally\n(D) He managed to _____ the old computer to make it work\n(I) get over  (II) fix up  (III) submit  (IV) bind",opts:["(A)-(III),(B)-(I),(C)-(IV),(D)-(II)","(A)-(I),(B)-(III),(C)-(II),(D)-(IV)","(A)-(IV),(B)-(II),(C)-(I),(D)-(III)","(A)-(II),(B)-(IV),(C)-(III),(D)-(I)"],correct:0,exp:"Submit = hand in online (A-III); Get over = recover from loss (B-I); Bind = legally tie (C-IV); Fix up = repair (D-II). So A-III, B-I, C-IV, D-II."}
+    ]
+  },
+  // MOCK 5
+  {
+    id:5,
+    title:"Mock Test 5",
+    questions:[
+      // RC1: Factual (Q1-Q4) — Mental Health
+      {id:1,section:"rc",passage:"m5p1",text:"According to the WHO definition cited in the passage, mental health is:-",opts:["the absence of any diagnosed mental disorder","a state of well-being where individuals realise their abilities and contribute to society","the ability to handle any stress without any support","a medical condition requiring continuous medication"],correct:1,exp:"The passage states: 'The WHO defines mental health not merely as the absence of mental disorders, but as a state of well-being in which individuals realise their abilities, cope with normal life stresses, work productively, and contribute to their communities.'"},
+      {id:2,section:"rc",passage:"m5p1",text:"Which of the following best describes 'stigma' as discussed in the passage?",opts:["A form of mental illness","A medical treatment for mental health","A social barrier that prevents people from seeking help","A government policy on mental health"],correct:2,exp:"The passage states: 'Stigma remains one of the most pervasive challenges, preventing individuals from seeking help and perpetuating cycles of silence and suffering.'"},
+      {id:3,section:"rc",passage:"m5p1",text:"What does the passage identify as the 'treatment gap'?",opts:["The gap between rich and poor countries in health spending","The difference between medical and psychological treatment","The proportion of people needing mental health care who do not receive it","The period between a diagnosis and when treatment begins"],correct:2,exp:"The passage defines the treatment gap as 'the proportion of those needing care who do not receive it — exceeds eighty percent in many states.'"},
+      {id:4,section:"rc",passage:"m5p1",text:"The author argues that investing in mental health is 'not merely a humanitarian imperative; it is an economic one.' This statement implies:-",opts:["Mental health is less important than economic development","Poor mental health has measurable economic consequences","Economic growth automatically improves mental health","Only rich countries can afford mental health investment"],correct:1,exp:"The passage states: 'Untreated mental illness costs nations trillions in lost productivity annually.' This provides the economic rationale — mental illness affects economic output, making investment in mental health an economic as well as humanitarian necessity."},
+      // RC2: Narrative (Q5-Q8) — The Interpreter
+      {id:5,section:"rc",passage:"m5p2",text:"What does Fatima mean when she says she had 'always kept herself on the technical side of language'?",opts:["She only worked with technical or scientific language","She maintained emotional distance, focusing on translating words rather than feelings","She preferred technical documents over literary texts","She used computerised translation tools"],correct:1,exp:"Fatima describes translating 'words of grief' but 'never truly' translating grief itself. 'The technical side' means she focused on literal word translation while staying emotionally detached from the underlying human experience."},
+      {id:6,section:"rc",passage:"m5p2",text:"What causes Fatima's approach to translation to change in this encounter?",opts:["She learns a new language on that day","She is given additional training by the resettlement office","She encounters grief communicated through silences and physical gestures, not just words","Her supervisor asks her to be more empathetic"],correct:2,exp:"Fatima begins translating 'not just the words but the silences between them' because the Rohingya woman communicates through 'pauses... the way she pressed the photograph flat... the slight motion of her shoulders.' Non-verbal grief forces her beyond technical translation."},
+      {id:7,section:"rc",passage:"m5p2",text:"The metaphor of 'filling a rest in a score not with sound but with attention' suggests that:-",opts:["Fatima was a musician before becoming an interpreter","Silence in translation is as meaningful as the words spoken","Good translators must understand music","The resettlement office used music as therapy"],correct:1,exp:"In music, a 'rest' is a period of silence — but skilled musicians hold that silence with attention, not vacancy. Fatima's translation of silences means giving them interpretive weight, treating absence of speech as meaningful content, not empty space to skip."},
+      {id:8,section:"rc",passage:"m5p2",text:"The passage concludes that 'language, at its deepest, was not about words at all.' What is the author suggesting?",opts:["Language is an ineffective form of communication","True communication involves empathy, presence, and shared humanity beyond verbal expression","Languages should be replaced by non-verbal communication","Professional interpreters are unnecessary"],correct:1,exp:"The passage builds to this conclusion through Fatima's experience of translating grief communicated through gestures, pauses, and presence. The woman's parting touch conveyed understanding beyond what words could carry — suggesting language at its deepest is human connection."},
+      // RC3: Literary (Q9-Q12) — Museum of Ordinary Things
+      {id:9,section:"rc",passage:"m5p3",text:"Why does Dr. Nair's answer to 'Why a sandal?' begin with 'Because someone wore it'?",opts:["She is being dismissive of the journalist's question","She is emphasising that ordinary objects derive significance from their human connection","She doesn't know the historical context of the sandal","She wants to end the interview quickly"],correct:1,exp:"'Because someone wore it' focuses attention on the human connection — the sandal's significance comes not from rarity or beauty, but from its use by a specific human being. Dr. Nair's answer redirects from the object to the person who gave it meaning."},
+      {id:10,section:"rc",passage:"m5p3",text:"The visitors who 'sometimes had to step outside for air' are described positively. What does this suggest?",opts:["The museum's ventilation system was inadequate","The objects were displayed in a confusing way","The emotional weight of ordinary objects was genuinely affecting those who understood them","The museum was overcrowded and poorly designed"],correct:2,exp:"Needing 'to step outside for air' implies being emotionally overwhelmed — a deep reaction. These visitors are described as understanding 'that the ordinary was not the opposite of significant.' Their emotional response affirms the museum's purpose."},
+      {id:11,section:"rc",passage:"m5p3",text:"Dr. Nair says: 'The job of the curator was not to tell people what to feel. It was to create conditions in which feeling became possible.' This reveals her philosophy that:-",opts:["Curators should explain every object in detail","Art and history should speak to people without being over-explained","Museums should only display emotionally neutral objects","Visitors should be taught how to respond to historical objects"],correct:1,exp:"Dr. Nair's philosophy is that a curator creates context and space, then allows visitors to find their own emotional connection. This contrasts with over-explaining or directing — she trusts that meaning will emerge when the conditions are right."},
+      {id:12,section:"rc",passage:"m5p3",text:"The phrase 'the ordinary was not the opposite of significant — it was significance in its most honest form' is an example of:-",opts:["Hyperbole","Paradox","Simile","Alliteration"],correct:1,exp:"This is a paradox — a statement that seems contradictory but reveals a deeper truth. The ordinary appears to be the opposite of significant (in common understanding), but the statement inverts this, arguing the ordinary IS the most authentic form of significance."},
+      {id:13,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) and the cultural heritage of future generations\n(B) sustainable tourism aims to balance\n(C) while minimising harmful environmental impacts\n(D) the economic benefits of travel",opts:["(B),(D),(C),(A)","(A),(C),(B),(D)","(D),(B),(A),(C)","(C),(A),(D),(B)"],correct:0,exp:"The correct order is B→D→C→A: 'Sustainable tourism aims to balance the economic benefits of travel while minimising harmful environmental impacts and the cultural heritage of future generations.'"},
+      {id:14,section:"vocab",passage:null,text:"Select the correct synonym for the word: Circumspect.",opts:["Reckless","Cautious and wary","Careless","Impulsive"],correct:1,exp:"Circumspect means wary and unwilling to take risks. 'Cautious and wary' is the closest synonym. Reckless, careless, and impulsive are antonyms. From Latin 'circumspicere' meaning to look around."},
+      {id:15,section:"vocab",passage:null,text:"Choose the most appropriate antonym for the word: Ignominious.",opts:["Shameful","Disgraceful","Honourable","Humiliating"],correct:2,exp:"Ignominious means deserving or causing public disgrace or shame. Its antonym is 'honourable' — bringing or deserving honour and respect. Shameful, disgraceful, and humiliating are synonyms."},
+      {id:16,section:"vocab",passage:null,text:"Select the correct synonym for the word: Recalcitrant.",opts:["Obedient","Cooperative","Defiant","Submissive"],correct:2,exp:"Recalcitrant means having an obstinately uncooperative attitude toward authority. 'Defiant' is the closest synonym — showing open resistance. Obedient, cooperative, and submissive are antonyms."},
+      {id:17,section:"grammar",passage:null,text:"Choose the correct option: ______ leaving for work, she remembered to take her umbrella.",opts:["Before","After","When","While"],correct:2,exp:"'When' describes the moment of an action. 'When leaving for work' is more natural and precise here because the remembering happens at the moment of leaving. 'Before' and 'after' imply different timing. 'While' suggests simultaneous ongoing action."},
+      {id:18,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) and food security for vulnerable populations globally\n(B) climate change poses a critical threat to agricultural productivity\n(C) requiring urgent international cooperation to develop\n(D) resilient farming systems that can protect livelihoods",opts:["(B),(A),(C),(D)","(A),(C),(B),(D)","(C),(D),(A),(B)","(D),(B),(C),(A)"],correct:0,exp:"The correct order is B→A→C→D: 'Climate change poses a critical threat to agricultural productivity and food security for vulnerable populations globally requiring urgent international cooperation to develop resilient farming systems that can protect livelihoods.'"},
+      {id:19,section:"vocab",passage:null,text:"Match List-I (Words) with List-II (Definitions):\n(A) Anachronism  (B) Dichotomy  (C) Paradox  (D) Euphemism\n(I) A mild expression used instead of an unpleasant one\n(II) A division into two contrasting things\n(III) Something placed in the wrong historical period\n(IV) A statement that contradicts itself but reveals a truth",opts:["(A)-(III),(B)-(II),(C)-(IV),(D)-(I)","(A)-(I),(B)-(IV),(C)-(II),(D)-(III)","(A)-(II),(B)-(I),(C)-(III),(D)-(IV)","(A)-(IV),(B)-(III),(C)-(I),(D)-(II)"],correct:0,exp:"Anachronism = something in wrong period (III); Dichotomy = division into two contrasting things (II); Paradox = self-contradicting statement revealing truth (IV); Euphemism = mild expression instead of harsh one (I)."},
+      {id:20,section:"grammar",passage:null,text:"Choose the correct option: By the time she arrived at the station, the train ______ already.",opts:["has departed","departed","had departed","was departing"],correct:2,exp:"When one past action precedes another past action, the earlier action uses the past perfect tense. 'By the time she arrived' (simple past) establishes the reference point; 'the train had already departed' (past perfect) shows what happened before that point."},
+      {id:21,section:"vocab",passage:null,text:"Choose the best one-word substitute: A government run by the most able and deserving people.",opts:["Monarchy","Democracy","Meritocracy","Plutocracy"],correct:2,exp:"A Meritocracy is a system in which advancement is based on individual ability or achievement, with the most capable people in positions of power. From Latin 'meritus' (deserved) + Greek 'kratos' (power)."},
+      {id:22,section:"vocab",passage:null,text:"Choose the most appropriate antonym for the word: Truculent.",opts:["Aggressive","Hostile","Peaceable","Combative"],correct:2,exp:"Truculent means eager or quick to argue or fight; aggressively defiant. Its antonym is 'peaceable' — inclined to avoid quarrels and promote peaceful relations. Aggressive, hostile, and combative are synonyms."},
+      {id:23,section:"idioms",passage:null,text:"Identify the correct meaning of the idiom: 'Throw in the towel'",opts:["To clean up after a game","To admit defeat and give up","To signal the start of a fight","To show sporting respect"],correct:1,exp:"'Throw in the towel' means to admit defeat; to give up or stop trying. The phrase comes from boxing where a trainer throws a towel into the ring to stop the fight and concede defeat on behalf of their fighter."},
+      {id:24,section:"grammar",passage:null,text:"Choose the correct option: The delegation, including the minister and her advisors, ______ due to arrive tomorrow.",opts:["is","are","were","have been"],correct:0,exp:"The subject is 'the delegation' (singular collective noun). 'Including the minister and her advisors' is a parenthetical phrase that doesn't change the grammatical subject. Singular subject takes singular verb: 'is due to arrive.'"},
+      {id:25,section:"vocab",passage:null,text:"Select the correct synonym for the word: Cacophony.",opts:["Harmony","Discord and noise","Melody","Symphony"],correct:1,exp:"Cacophony means a harsh mixture of sounds. 'Discord and noise' is the closest synonym. Harmony, melody, and symphony are antonyms. From Greek 'kakos' (bad) + 'phone' (voice/sound)."},
+      {id:26,section:"vocab",passage:null,text:"Choose the best option that explains the given statement in one word: The action of one country attacking and taking control of another country by force.",opts:["Diplomacy","Invasion","Treaty","Alliance"],correct:1,exp:"Invasion refers to an instance of invading a country with an armed force, or any entry in large numbers to take over. From Latin 'invasio' meaning attack, assault."},
+      {id:27,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) representing one of the most dramatic climate success stories\n(B) the concerted global effort to phase out\n(C) and demonstrating that international cooperation\n(D) ozone-depleting substances under the Montreal Protocol",opts:["(B),(D),(A),(C)","(A),(C),(D),(B)","(D),(B),(C),(A)","(C),(B),(D),(A)"],correct:0,exp:"The correct order is B→D→A→C: 'The concerted global effort to phase out ozone-depleting substances under the Montreal Protocol representing one of the most dramatic climate success stories and demonstrating that international cooperation.'"},
+      {id:28,section:"idioms",passage:null,text:"Choose the correct idiom: Despite the team's best efforts, the project ______ and had to be abandoned.",opts:["came to fruition","fell through","stood its ground","broke new ground"],correct:1,exp:"'Fell through' means to fail to happen; to not be completed despite expectations or plans. It perfectly describes a project that was abandoned after failing to succeed, despite the team's efforts."},
+      {id:29,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) to transmit information across vast distances instantaneously\n(B) the invention of the telegraph in the 19th century\n(C) transforming commerce, journalism, and diplomacy forever\n(D) marked the first time humans could use technology",opts:["(B),(D),(A),(C)","(A),(C),(D),(B)","(D),(C),(B),(A)","(C),(B),(A),(D)"],correct:0,exp:"The correct order is B→D→A→C: 'The invention of the telegraph in the 19th century marked the first time humans could use technology to transmit information across vast distances instantaneously transforming commerce, journalism, and diplomacy forever.'"},
+      {id:30,section:"grammar",passage:null,text:"Select the most appropriate option: The children ______ not allowed to watch television until they completed their homework.",opts:["is","was","were","are"],correct:2,exp:"'The children' is a plural noun, requiring a plural verb. The context describes a past habitual rule ('until they completed'), suggesting simple past tense. 'Were' (plural past) is correct."},
+      {id:31,section:"grammar",passage:null,text:"Choose the correct option: ______ your best, you should have no regrets regardless of the outcome.",opts:["Having done","To do","By doing","Doing"],correct:0,exp:"'Having done your best' is a perfect participle phrase indicating that the action of doing one's best precedes the main clause. It establishes a completed prior condition. 'By doing' or 'Doing' would also be grammatically possible but 'Having done' is most precise."},
+      {id:32,section:"vocab",passage:null,text:"Choose the correct antonym of the word: Veracious.",opts:["Truthful","Honest","Lying","Authentic"],correct:2,exp:"Veracious means speaking or representing the truth. Its antonym is 'lying' — stating something that is untrue with intent to deceive. Truthful, honest, and authentic are synonyms of veracious."},
+      {id:33,section:"idioms",passage:null,text:"Match idioms (List-I) with meanings (List-II):\n(A) In the same boat  (B) Miss the boat  (C) Rock the boat  (D) Burn one's boats\n(I) Take irreversible action  (II) In the same difficult situation  (III) Disturb a stable situation  (IV) Miss an opportunity",opts:["(A)-(II),(B)-(IV),(C)-(III),(D)-(I)","(A)-(I),(B)-(III),(C)-(II),(D)-(IV)","(A)-(III),(B)-(I),(C)-(IV),(D)-(II)","(A)-(IV),(B)-(II),(C)-(I),(D)-(III)"],correct:0,exp:"In the same boat = in the same difficult situation (II); Miss the boat = miss an opportunity (IV); Rock the boat = disturb a stable situation (III); Burn one's boats = take irreversible action (I)."},
+      {id:34,section:"vocab",passage:null,text:"Select the correct synonym for the word: Recondite.",opts:["Common","Obvious","Obscure and little known","Popular"],correct:2,exp:"Recondite means not known by many people; obscure or little known. 'Obscure and little known' is the direct synonym. Common, obvious, and popular are antonyms."},
+      {id:35,section:"vocab",passage:null,text:"Choose the correct antonym of the underlined word: The prolific author published over thirty novels in her lifetime.",opts:["productive","fertile","unproductive","creative"],correct:2,exp:"Prolific means producing many works, results, or offspring. Its antonym is 'unproductive' — not producing or achieving much. Productive, fertile, and creative are synonyms."},
+      {id:36,section:"vocab",passage:null,text:"Fill blanks (List-I) with suitable words (List-II):\n(A) The country faced an _____ economic crisis\n(B) Her _____ smile made everyone feel welcome\n(C) The _____ landscape attracted many photographers\n(D) His _____ approach to problems always found solutions\n(I) pragmatic  (II) unprecedented  (III) serene  (IV) radiant",opts:["(A)-(II),(B)-(IV),(C)-(III),(D)-(I)","(A)-(I),(B)-(III),(C)-(II),(D)-(IV)","(A)-(IV),(B)-(II),(C)-(I),(D)-(III)","(A)-(III),(B)-(I),(C)-(IV),(D)-(II)"],correct:0,exp:"Unprecedented = never done before (A-II); Radiant = glowing, bright (B-IV); Serene = calm, peaceful landscape (C-III); Pragmatic = practical approach (D-I). So A-II, B-IV, C-III, D-I."},
+      {id:37,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) while also helping to reduce social isolation\n(B) community volunteering builds essential professional skills\n(C) such as leadership, communication, and teamwork,\n(D) and strengthen civic bonds among diverse groups",opts:["(B),(C),(A),(D)","(A),(D),(B),(C)","(C),(B),(D),(A)","(D),(C),(A),(B)"],correct:0,exp:"The correct order is B→C→A→D: 'Community volunteering builds essential professional skills such as leadership, communication, and teamwork, while also helping to reduce social isolation and strengthen civic bonds among diverse groups.'"},
+      {id:38,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) cultural diversity as a source of strength\n(B) multicultural societies that successfully embrace\n(C) and innovation tend to be more resilient\n(D) and adaptable in the face of global challenges",opts:["(B),(A),(C),(D)","(A),(C),(D),(B)","(C),(B),(A),(D)","(D),(A),(B),(C)"],correct:0,exp:"The correct order is B→A→C→D: 'Multicultural societies that successfully embrace cultural diversity as a source of strength and innovation tend to be more resilient and adaptable in the face of global challenges.'"},
+      {id:39,section:"vocab",passage:null,text:"Choose the correct antonym for the word: Mendacious.",opts:["Deceptive","Dishonest","Truthful","Untruthful"],correct:2,exp:"Mendacious means not telling the truth; lying. Its antonym is 'truthful' — telling or expressing the truth. Deceptive, dishonest, and untruthful are synonyms of mendacious."},
+      {id:40,section:"idioms",passage:null,text:"Identify the correct meaning of the idiom: 'Miss the forest for the trees'",opts:["To get lost in a forest","To fail to see the big picture because of focus on details","To admire individual trees in a forest","To cut down trees without concern for the environment"],correct:1,exp:"'Miss the forest for the trees' (or 'can't see the wood for the trees') means to fail to understand a situation or problem as a whole because you are focused on minor details. The big picture is lost in excessive attention to specifics."},
+      {id:41,section:"vocab",passage:null,text:"Select the correct synonym for the word: Insipid.",opts:["Tasty","Stimulating","Dull and lacking flavour","Exciting"],correct:2,exp:"Insipid means lacking flavour; weak and tasteless. By extension, it means lacking vigour or interest — dull and unexciting. 'Dull and lacking flavour' is the direct synonym. Tasty, stimulating, and exciting are antonyms."},
+      {id:42,section:"literary",passage:null,text:"Identify the figure of speech: 'The pen is mightier than the sword.'",opts:["Personification","Simile","Metaphor","Hyperbole"],correct:2,exp:"This famous phrase by Edward Bulwer-Lytton is a metaphor — comparing the influence of writing (pen) to physical force (sword) by directly stating one is mightier than the other, without using 'like' or 'as'."},
+      {id:43,section:"vocab",passage:null,text:"Match phrasal verbs (List-I) with meanings (List-II):\n(A) Fall apart  (B) Get across  (C) Break down  (D) Work out\n(I) Communicate effectively  (II) Exercise  (III) Disintegrate or collapse  (IV) Stop functioning",opts:["(A)-(III),(B)-(I),(C)-(IV),(D)-(II)","(A)-(I),(B)-(III),(C)-(II),(D)-(IV)","(A)-(IV),(B)-(II),(C)-(I),(D)-(III)","(A)-(II),(B)-(IV),(C)-(III),(D)-(I)"],correct:0,exp:"Fall apart = disintegrate/collapse (III); Get across = communicate effectively (I); Break down = stop functioning (IV); Work out = exercise (II). So A-III, B-I, C-IV, D-II."},
+      {id:44,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) to ethical standards in their research and publications\n(B) ensuring the integrity of academic knowledge\n(C) requires scholars to adhere strictly\n(D) and avoid plagiarism, fabrication, or distortion of findings",opts:["(C),(A),(D),(B)","(A),(C),(D),(B)","(B),(C),(A),(D)","(D),(B),(A),(C)"],correct:2,exp:"The correct order is B→C→A→D: 'Ensuring the integrity of academic knowledge requires scholars to adhere strictly to ethical standards in their research and publications and avoid plagiarism, fabrication, or distortion of findings.'"},
+      {id:45,section:"vocab",passage:null,text:"Choose the most appropriate synonym of the underlined word: The audacious plan required courage and creativity to execute.",opts:["timid","cautious","daring","careful"],correct:2,exp:"Audacious means showing a willingness to take surprisingly bold risks. 'Daring' is the closest synonym — adventurously bold or requiring courage. Timid and cautious are antonyms."},
+      {id:46,section:"idioms",passage:null,text:"Identify the correct meaning of the idiom: 'Don't judge a book by its cover'",opts:["Always read books before buying them","Do not judge someone or something based on appearance alone","Book covers are important in marketing","Reading books improves judgment"],correct:1,exp:"'Don't judge a book by its cover' means you should not form an opinion about something or someone based solely on outward appearance. Deeper qualities may not be visible at first glance."},
+      {id:47,section:"parajumble",passage:null,text:"Rearrange the parts to form a meaningful sentence:\n(A) by bridging the gap between theoretical research\n(B) translational medicine seeks to improve patient outcomes\n(C) and the application of medical discoveries\n(D) directly in clinical settings to treat disease",opts:["(B),(A),(C),(D)","(A),(C),(B),(D)","(C),(D),(A),(B)","(D),(B),(C),(A)"],correct:0,exp:"The correct order is B→A→C→D: 'Translational medicine seeks to improve patient outcomes by bridging the gap between theoretical research and the application of medical discoveries directly in clinical settings to treat disease.'"},
+      {id:48,section:"grammar",passage:null,text:"Choose the correct option to fill in the blank: She works ______ a teacher at a local school.",opts:["as","like","for","by"],correct:0,exp:"'As' is used to indicate a role, function, or capacity. 'She works as a teacher' means teaching is her profession/role. 'Like' would make a comparison (similar to a teacher) which is incorrect here."},
+      {id:49,section:"grammar",passage:null,text:"Choose the correct option: He ______ play cricket very well when he was young.",opts:["can","could","would","should"],correct:1,exp:"'Could' is used to express ability in the past. 'He could play cricket well' means he had the ability to play cricket in the past. 'Can' is present tense; 'would' expresses habit; 'should' expresses obligation."},
+      {id:50,section:"vocab",passage:null,text:"Fill blanks (List-I) with suitable phrasal verbs (List-II):\n(A) The loud music _____ their attempts to sleep\n(B) She _____ the exam despite her initial nervousness\n(C) The old building was _____ to make way for a park\n(D) He _____ learning Spanish as his New Year resolution\n(I) pulled through  (II) took up  (III) torn down  (IV) interfered with",opts:["(A)-(IV),(B)-(I),(C)-(III),(D)-(II)","(A)-(I),(B)-(IV),(C)-(II),(D)-(III)","(A)-(III),(B)-(II),(C)-(I),(D)-(IV)","(A)-(II),(B)-(III),(C)-(IV),(D)-(I)"],correct:0,exp:"Interfered with = disrupted/hindered (A-IV); Pulled through = succeeded despite difficulties (B-I); Torn down = demolished (C-III); Took up = started a new activity (D-II). So A-IV, B-I, C-III, D-II."}
+    ]
+  }
+];
+
+// ===================== APP STATE =====================
+let currentMockId = null;
+let currentAttempt = null;
+let currentQIndex = 0;
+let answers = {};      // qIndex -> option index
+let statuses = {};     // qIndex -> 'not-visited'|'not-answered'|'answered'|'marked'|'marked-answered'
+let timePerQ = {};     // qIndex -> seconds
+let qStartTime = null;
+let timerInterval = null;
+let timeLeft = 3600;   // 60 mins
+let currentAttemptData = null; // loaded attempt
+let analyticsAttemptData = null;
+
+const SECTION_LABELS = {rc:'Reading Comprehension',vocab:'Vocabulary',grammar:'Grammar',parajumble:'Para Jumbles',idioms:'Idioms & Phrases',literary:'Literary Devices'};
+const SECTION_TAGS = {rc:'tag-rc',vocab:'tag-vocab',grammar:'tag-grammar',parajumble:'tag-parajumble',idioms:'tag-idioms',literary:'tag-literary'};
+
+// ===================== HOME SCREEN =====================
+function renderHome() {
+  const grid = document.getElementById('mockGrid');
+  grid.innerHTML = '';
+  MOCKS.forEach(mock => {
+    const a1 = loadAttempt(mock.id, 1);
+    const a2 = loadAttempt(mock.id, 2);
+    const card = document.createElement('div');
+    card.className = 'mock-card';
+    card.innerHTML = `
+      <div class="mock-title">${mock.title}</div>
+      <div class="mock-info">50 Questions · 60 Minutes · +5/-1 Marking</div>
+      <div class="mock-btns">
+        <button class="btn ${a1 ? 'btn-secondary' : 'btn-primary'}" onclick="startAttempt(${mock.id},1)" ${a1 && a1.submitted ? '' : (!a1 ? '' : 'style="display:none"')}>
+          ${a1 ? (a1.submitted ? '📊 Results 1' : '▶ Resume 1') : '▶ Start Attempt 1'}
+        </button>
+        ${a1 && a1.submitted ? `<button class="btn btn-outline" onclick="reviewAttempt(${mock.id},1)">📋 Review 1</button>` : ''}
+        <button class="btn ${a2 ? 'btn-secondary' : (a1 && a1.submitted ? 'btn-primary' : 'btn-disabled')}" onclick="${a1 && a1.submitted ? `startAttempt(${mock.id},2)` : ''}" ${!a1 || !a1.submitted ? 'disabled title="Complete Attempt 1 first"' : ''}>
+          ${a2 ? (a2.submitted ? '📊 Results 2' : '▶ Resume 2') : '▶ Start Attempt 2'}
+        </button>
+        ${a2 && a2.submitted ? `<button class="btn btn-outline" onclick="reviewAttempt(${mock.id},2)">📋 Review 2</button>` : ''}
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function loadAttempt(mockId, attempt) {
+  try {
+    const key = `cuet_m${mockId}_a${attempt}`;
+    const d = localStorage.getItem(key);
+    return d ? JSON.parse(d) : null;
+  } catch(e){ return null; }
+}
+
+function saveAttempt(mockId, attempt, data) {
+  try {
+    localStorage.setItem(`cuet_m${mockId}_a${attempt}`, JSON.stringify(data));
+  } catch(e){}
+}
+
+function startAttempt(mockId, attempt) {
+  const existing = loadAttempt(mockId, attempt);
+  if (existing && existing.submitted) {
+    showAnalytics(mockId, attempt, existing);
+    return;
+  }
+  currentMockId = mockId;
+  currentAttempt = attempt;
+  const mock = MOCKS.find(m => m.id === mockId);
+  // Load or init
+  if (existing && !existing.submitted) {
+    answers = existing.answers || {};
+    statuses = existing.statuses || {};
+    timePerQ = existing.timePerQ || {};
+    timeLeft = existing.timeLeft !== undefined ? existing.timeLeft : 3600;
+    currentQIndex = existing.lastQ || 0;
+  } else {
+    answers = {};
+    statuses = {};
+    timePerQ = {};
+    timeLeft = 3600;
+    currentQIndex = 0;
+    mock.questions.forEach((q,i) => { statuses[i] = 'not-visited'; });
+  }
+  document.getElementById('testTitle').textContent = `${mock.title} — Attempt ${attempt}`;
+  showScreen('testScreen');
+  buildPalette();
+  renderQuestion(currentQIndex);
+  startTimer();
+}
+
+function reviewAttempt(mockId, attempt) {
+  const data = loadAttempt(mockId, attempt);
+  if (data) showAnalytics(mockId, attempt, data);
+}
+
+// ===================== TEST SCREEN =====================
+function getCurrentMock() { return MOCKS.find(m => m.id === currentMockId); }
+function getCurrentQ() { return getCurrentMock().questions[currentQIndex]; }
+
+function renderQuestion(idx) {
+  if (qStartTime) saveQTime();
+  currentQIndex = idx;
+  qStartTime = Date.now();
+  const q = getCurrentMock().questions[idx];
+  // Mark as visited if not already answered/marked
+  if (statuses[idx] === 'not-visited') statuses[idx] = 'not-answered';
+  // Passage
+  const hasPassage = !!q.passage;
+  const body = document.getElementById('testBody');
+  if (hasPassage) {
+    body.classList.remove('no-passage');
+    const pData = PASSAGES[q.passage];
+    document.getElementById('passageLabel').textContent = pData.title;
+    document.getElementById('passageContent').innerHTML = pData.text;
+  } else {
+    body.classList.add('no-passage');
+  }
+  // Section tag
+  const tag = document.getElementById('qSectionTag');
+  tag.textContent = SECTION_LABELS[q.section] || q.section;
+  tag.className = `q-section-tag ${SECTION_TAGS[q.section] || ''}`;
+  // Question
+  document.getElementById('qNumber').textContent = `Question ${idx+1} of 50`;
+  document.getElementById('qText').innerHTML = q.text.replace(/\n/g,'<br>');
+  // Options
+  const ol = document.getElementById('optionsList');
+  ol.innerHTML = '';
+  const keys = ['A','B','C','D'];
+  q.opts.forEach((opt,i) => {
+    const li = document.createElement('li');
+    li.className = `option-item${answers[idx] === i ? ' selected' : ''}`;
+    li.innerHTML = `<label class="option-label"><span class="option-key">${keys[i]}</span><span class="option-text">${opt.replace(/\n/g,'<br>')}</span></label>`;
+    li.onclick = () => selectOption(i);
+    ol.appendChild(li);
+  });
+  // Mark btn
+  const marked = statuses[idx] === 'marked' || statuses[idx] === 'marked-answered';
+  document.getElementById('markBtn').textContent = marked ? '★ Marked' : 'Mark for Review';
+  updatePalette();
+  updateCounts();
+}
+
+function selectOption(i) {
+  answers[currentQIndex] = i;
+  if (statuses[currentQIndex] === 'marked') statuses[currentQIndex] = 'marked-answered';
+  else statuses[currentQIndex] = 'answered';
+  renderQuestion(currentQIndex);
+}
+
+function saveAndNext() {
+  if (answers[currentQIndex] !== undefined) statuses[currentQIndex] = 'answered';
+  const next = currentQIndex < 49 ? currentQIndex + 1 : currentQIndex;
+  renderQuestion(next);
+  autoSave();
+}
+
+function prevQuestion() {
+  if (currentQIndex > 0) renderQuestion(currentQIndex - 1);
+  autoSave();
+}
+
+function markForReview() {
+  const s = statuses[currentQIndex];
+  if (s === 'answered' || answers[currentQIndex] !== undefined) statuses[currentQIndex] = 'marked-answered';
+  else statuses[currentQIndex] = 'marked';
+  const next = currentQIndex < 49 ? currentQIndex + 1 : currentQIndex;
+  renderQuestion(next);
+  autoSave();
+}
+
+function clearResponse() {
+  delete answers[currentQIndex];
+  statuses[currentQIndex] = 'not-answered';
+  renderQuestion(currentQIndex);
+  autoSave();
+}
+
+function buildPalette() {
+  const grid = document.getElementById('paletteGrid');
+  grid.innerHTML = '';
+  for (let i = 0; i < 50; i++) {
+    const btn = document.createElement('button');
+    btn.className = `palette-btn ${statuses[i] || 'not-visited'}`;
+    btn.textContent = i + 1;
+    btn.id = `pb_${i}`;
+    btn.onclick = () => { renderQuestion(i); autoSave(); };
+    grid.appendChild(btn);
+  }
+}
+
+function updatePalette() {
+  for (let i = 0; i < 50; i++) {
+    const btn = document.getElementById(`pb_${i}`);
+    if (!btn) continue;
+    btn.className = `palette-btn ${statuses[i] || 'not-visited'}${i === currentQIndex ? ' current' : ''}`;
+  }
+}
+
+function updateCounts() {
+  let ans=0,notAns=0,marked=0,notVis=0;
+  for (let i=0;i<50;i++) {
+    const s = statuses[i] || 'not-visited';
+    if (s==='answered') ans++;
+    else if (s==='not-answered') notAns++;
+    else if (s==='marked'||s==='marked-answered') marked++;
+    else notVis++;
+  }
+  document.getElementById('cntAnswered').textContent = ans;
+  document.getElementById('cntNotAnswered').textContent = notAns;
+  document.getElementById('cntMarked').textContent = marked;
+  document.getElementById('cntNotVisited').textContent = notVis;
+}
+
+function saveQTime() {
+  if (qStartTime) {
+    const elapsed = Math.round((Date.now() - qStartTime) / 1000);
+    timePerQ[currentQIndex] = (timePerQ[currentQIndex] || 0) + elapsed;
+    qStartTime = null;
+  }
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) { clearInterval(timerInterval); submitTest(); }
+    // Auto-save every 30s
+    if (timeLeft % 30 === 0) autoSave();
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timeLeft/60);
+  const s = timeLeft % 60;
+  const display = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const el = document.getElementById('timerDisplay');
+  el.textContent = display;
+  if (timeLeft <= 300) { el.className = 'timer danger'; }
+  else if (timeLeft <= 600) { el.className = 'timer warning'; }
+  else { el.className = 'timer'; }
+}
+
+function autoSave() {
+  saveAttempt(currentMockId, currentAttempt, {
+    answers, statuses, timePerQ, timeLeft,
+    lastQ: currentQIndex, submitted: false
+  });
+}
+
+function confirmSubmit() {
+  let ans = Object.values(statuses).filter(s=>s==='answered'||s==='marked-answered').length;
+  let unans = 50 - ans;
+  document.getElementById('submitModalText').innerHTML = 
+    `<strong>Answered:</strong> ${ans} &nbsp; <strong>Unanswered:</strong> ${unans}<br><br>Are you sure you want to submit? This action cannot be undone.`;
+  document.getElementById('submitModal').classList.remove('hidden');
+}
+
+function closeModal() { document.getElementById('submitModal').classList.add('hidden'); }
+
+function submitTest() {
+  closeModal();
+  clearInterval(timerInterval);
+  saveQTime();
+  // Calculate results
+  const mock = getCurrentMock();
+  let score = 0, correct = 0, wrong = 0, skipped = 0;
+  mock.questions.forEach((q,i) => {
+    if (answers[i] === undefined) { skipped++; }
+    else if (answers[i] === q.correct) { score += 5; correct++; }
+    else { score -= 1; wrong++; }
+  });
+  const data = {
+    answers, statuses, timePerQ, timeLeft, lastQ: currentQIndex,
+    submitted: true, score, correct, wrong, skipped,
+    totalTime: 3600 - timeLeft
+  };
+  saveAttempt(currentMockId, currentAttempt, data);
+  showAnalytics(currentMockId, currentAttempt, data);
+  renderHome();
+}
+
+// ===================== ANALYTICS =====================
+function showAnalytics(mockId, attempt, data) {
+  analyticsAttemptData = { mockId, attempt, data };
+  const mock = MOCKS.find(m => m.id === mockId);
+  document.getElementById('analyticsTitle').textContent = `${mock.title} — Attempt ${attempt} Analytics`;
+  document.getElementById('analyticsSubtitle').textContent = `CUET English | Submitted`;
+  // Score
+  document.getElementById('scoreDisplay').textContent = data.score;
+  const pct = Math.round((data.correct / 50) * 100);
+  document.getElementById('scoreDetails').innerHTML = `
+    <div class="score-stat"><div class="score-stat-val stat-correct">${data.correct}</div><div class="score-stat-lbl">Correct</div></div>
+    <div class="score-stat"><div class="score-stat-val stat-wrong">${data.wrong}</div><div class="score-stat-lbl">Incorrect</div></div>
+    <div class="score-stat"><div class="score-stat-val stat-skip">${data.skipped}</div><div class="score-stat-lbl">Skipped</div></div>
+    <div class="score-stat"><div class="score-stat-val stat-acc">${pct}%</div><div class="score-stat-lbl">Accuracy</div></div>
+    <div class="score-stat"><div class="score-stat-val" style="color:var(--accent2)">${fmtTime(data.totalTime||0)}</div><div class="score-stat-lbl">Time Used</div></div>`;
+  // Percentile
+  const percentile = estimatePercentile(data.score);
+  document.getElementById('percentileFill').style.width = percentile + '%';
+  document.getElementById('percentileLabel').textContent = percentile + '%ile';
+  document.getElementById('percentileText').innerHTML = `Your score of <strong>${data.score}/250</strong> places you in approximately the <strong>${percentile}th percentile</strong> range. ${getPercentileMessage(percentile)}`;
+  // Section stats
+  const sections = {};
+  mock.questions.forEach((q,i) => {
+    const s = q.section;
+    if (!sections[s]) sections[s] = {attempted:0,correct:0,total:0};
+    sections[s].total++;
+    if (data.answers[i] !== undefined) {
+      sections[s].attempted++;
+      if (data.answers[i] === q.correct) sections[s].correct++;
+    }
+  });
+  let secHtml = '';
+  Object.entries(sections).forEach(([sec,d]) => {
+    const acc = d.attempted > 0 ? Math.round((d.correct/d.attempted)*100) : 0;
+    secHtml += `<div class="section-row">
+      <div><div class="section-name">${SECTION_LABELS[sec]}</div>
+      <div class="acc-bar"><div class="acc-fill" style="width:${acc}%"></div></div></div>
+      <div class="section-stats">
+        <div class="mini-stat">${d.correct}/${d.total}</div>
+        <div class="mini-stat" style="color:${acc>=70?'var(--green)':acc>=40?'var(--yellow)':'var(--red)'}">${acc}%</div>
+      </div></div>`;
+  });
+  document.getElementById('sectionStats').innerHTML = secHtml;
+  // Time analysis
+  const secTimes = {};
+  mock.questions.forEach((q,i) => {
+    const s = q.section;
+    if (!secTimes[s]) secTimes[s] = 0;
+    secTimes[s] += (data.timePerQ[i] || 0);
+  });
+  const maxTime = Math.max(...Object.values(secTimes), 1);
+  let timeHtml = '';
+  const avgTotal = Math.round((data.totalTime||0) / 50);
+  timeHtml += `<div style="margin-bottom:.75rem;font-size:.85rem;color:var(--text2)">Average per question: <strong>${avgTotal}s</strong></div>`;
+  Object.entries(secTimes).forEach(([sec,t]) => {
+    const secQ = sections[sec] ? sections[sec].total : 1;
+    timeHtml += `<div class="time-bar">
+      <div class="time-bar-name">${SECTION_LABELS[sec]}</div>
+      <div class="time-bar-track"><div class="time-bar-fill" style="width:${Math.round((t/maxTime)*100)}%"></div></div>
+      <div class="time-bar-val">${fmtTime(t)} (${Math.round(t/secQ)}s/q)</div></div>`;
+  });
+  document.getElementById('timeAnalysis').innerHTML = timeHtml;
+  // Smart insights
+  const insights = generateInsights(data, mock, sections, secTimes, avgTotal);
+  document.getElementById('smartInsights').innerHTML = insights;
+  showScreen('analyticsScreen');
+}
+
+function estimatePercentile(score) {
+  if (score >= 220) return 99;
+  if (score >= 200) return 95;
+  if (score >= 180) return 90;
+  if (score >= 160) return 85;
+  if (score >= 140) return 80;
+  if (score >= 120) return 70;
+  if (score >= 100) return 60;
+  if (score >= 80) return 50;
+  if (score >= 60) return 40;
+  if (score >= 40) return 30;
+  if (score >= 20) return 20;
+  return Math.max(5, Math.round(score));
+}
+
+function getPercentileMessage(p) {
+  if (p >= 90) return '🏆 Excellent performance! You are well above average.';
+  if (p >= 75) return '⭐ Good performance! Above average compared to test-takers.';
+  if (p >= 50) return '📈 Average performance. Focused practice can significantly improve your rank.';
+  return '📚 Below average. Consistent practice across all sections is recommended.';
+}
+
+function generateInsights(data, mock, sections, secTimes, avgTotal) {
+  const insights = [];
+  // Strong/weak sections
+  const secArr = Object.entries(sections).map(([s,d]) => ({s, acc: d.attempted>0?Math.round((d.correct/d.attempted)*100):0}));
+  const strong = secArr.filter(x=>x.acc>=75).map(x=>SECTION_LABELS[x.s]);
+  const weak = secArr.filter(x=>x.acc<50).map(x=>SECTION_LABELS[x.s]);
+  if (strong.length) insights.push(`<div class="insight-item good">💪 <strong>Strong areas:</strong> ${strong.join(', ')} — maintain this level.</div>`);
+  if (weak.length) insights.push(`<div class="insight-item bad">⚠️ <strong>Needs improvement:</strong> ${weak.join(', ')} — focus extra revision here.</div>`);
+  // Time insights
+  const slowSec = Object.entries(secTimes).filter(([s,t]) => {
+    const q = sections[s] ? sections[s].total : 1;
+    return Math.round(t/q) > avgTotal * 1.5;
+  }).map(([s]) => SECTION_LABELS[s]);
+  if (slowSec.length) insights.push(`<div class="insight-item warn">⏱️ You spent <strong>excessive time</strong> on: ${slowSec.join(', ')}. Practice speed strategies.</div>`);
+  // Accuracy on attempted
+  const attAcc = Math.round((data.correct/(data.correct+data.wrong))*100) || 0;
+  if (data.wrong > data.correct) insights.push(`<div class="insight-item bad">📉 Your accuracy on attempted questions is ${attAcc}%. Avoid guessing — negative marking (-1) can significantly reduce your score.</div>`);
+  else insights.push(`<div class="insight-item good">✅ Your accuracy on attempted questions is ${attAcc}%. Good precision!</div>`);
+  if (data.skipped > 15) insights.push(`<div class="insight-item warn">📝 You skipped ${data.skipped} questions. Focus on attempting all RC and para jumble questions.</div>`);
+  // General tip
+  insights.push(`<div class="insight-item">💡 <strong>Tip:</strong> RC passages should take 6–8 minutes each. Para jumbles should take 45–60 seconds each. Vocabulary questions should be answered in 20–30 seconds.</div>`);
+  return insights.join('');
+}
+
+function fmtTime(s) {
+  if (s < 60) return `${s}s`;
+  return `${Math.floor(s/60)}m ${s%60}s`;
+}
+
+function goToReview() {
+  if (analyticsAttemptData) showReview(analyticsAttemptData.mockId, analyticsAttemptData.attempt, analyticsAttemptData.data);
+}
+
+function goToAnalytics() {
+  if (analyticsAttemptData) showAnalytics(analyticsAttemptData.mockId, analyticsAttemptData.attempt, analyticsAttemptData.data);
+}
+
+// ===================== REVIEW SCREEN =====================
+let reviewFilter = 'all';
+function showReview(mockId, attempt, data) {
+  const mock = MOCKS.find(m => m.id === mockId);
+  document.getElementById('reviewTitle').textContent = `${mock.title} — Attempt ${attempt} Review`;
+  document.getElementById('reviewSubtitle').textContent = `Score: ${data.score}/250 | ${data.correct} Correct, ${data.wrong} Wrong, ${data.skipped} Skipped`;
+  const correct = mock.questions.filter((q,i) => data.answers[i] === q.correct).length;
+  const wrong = mock.questions.filter((q,i) => data.answers[i] !== undefined && data.answers[i] !== q.correct).length;
+  document.getElementById('filterCorrectBtn').textContent = `✓ Correct (${correct})`;
+  document.getElementById('filterWrongBtn').textContent = `✗ Wrong (${wrong})`;
+  reviewFilter = 'all';
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.filter-btn').classList.add('active');
+  renderReview(mock, data);
+  showScreen('reviewScreen');
+}
+
+function setFilter(f, btn) {
+  reviewFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if (analyticsAttemptData) {
+    const mock = MOCKS.find(m=>m.id===analyticsAttemptData.mockId);
+    renderReview(mock, analyticsAttemptData.data);
+  }
+}
+
+function renderReview(mock, data) {
+  const container = document.getElementById('reviewContent');
+  let html = '';
+  mock.questions.forEach((q,i) => {
+    const userAns = data.answers[i];
+    const isCorrect = userAns === q.correct;
+    const isSkipped = userAns === undefined;
+    if (reviewFilter === 'correct' && !isCorrect) return;
+    if (reviewFilter === 'wrong' && (isSkipped || isCorrect)) return;
+    if (reviewFilter === 'skipped' && !isSkipped) return;
+    const statusEl = isSkipped ? `<span class="status-skip">— Skipped</span>` :
+      isCorrect ? `<span class="status-correct">✔ Correct +5</span>` :
+      `<span class="status-wrong">✘ Wrong -1</span>`;
+    const keys = ['A','B','C','D'];
+    let optsHtml = q.opts.map((opt,oi) => {
+      let cls = 'review-option';
+      if (oi === q.correct) cls += ' correct';
+      else if (oi === userAns && !isCorrect) cls += ' wrong';
+      return `<li class="${cls}">${keys[oi]}. ${opt}</li>`;
+    }).join('');
+    const timeSpent = data.timePerQ[i] || 0;
+    let passageHtml = '';
+    if (q.passage) {
+      const pd = PASSAGES[q.passage];
+      passageHtml = `<div class="review-passage"><div class="review-passage-title">${pd.title}</div>${pd.text}</div>`;
+    }
+    html += `<div class="review-q">
+      <div class="review-q-header">
+        <span style="font-weight:700;color:var(--text)">Q${i+1}. <span class="q-section-tag ${SECTION_TAGS[q.section]}">${SECTION_LABELS[q.section]}</span></span>
+        ${statusEl}
+      </div>
+      ${passageHtml}
+      <div style="font-size:.9rem;line-height:1.6;margin-bottom:1rem">${q.text.replace(/\n/g,'<br>')}</div>
+      <ul class="review-options">${optsHtml}</ul>
+      <div class="review-explanation"><strong>Explanation:</strong> ${q.exp}</div>
+      <div class="review-time">Time spent: ${fmtTime(timeSpent)} | Your answer: ${userAns !== undefined ? `${keys[userAns]}. ${q.opts[userAns]}` : 'Not attempted'}</div>
+    </div>`;
+  });
+  container.innerHTML = html || '<div style="padding:2rem;text-align:center;color:var(--text2)">No questions match this filter.</div>';
+}
+
+// ===================== SCREEN MANAGEMENT =====================
+function showScreen(id) {
+  ['homeScreen','testScreen','analyticsScreen','reviewScreen'].forEach(s => {
+    document.getElementById(s).classList.toggle('hidden', s !== id);
+  });
+}
+
+function goHome() {
+  clearInterval(timerInterval);
+  renderHome();
+  showScreen('homeScreen');
+}
+
+// ===================== INIT =====================
+renderHome();
+</script>
+</body>
+</html>
